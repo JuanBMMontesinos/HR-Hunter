@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟢 F4 — Frontend Base, Design System, Auth & RBAC Concluída (Próxima: F5)  
+**Status Atual:** 🟢 F5 — Frontend CRUDs, Kanban, Dashboard & Settings Concluída (Próxima: F6)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -106,10 +106,10 @@ As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabas
 - [x] Cobrir componentes, helpers e fluxo E2E com Playwright (`18` Component Tests em `frontend/tests/ct/`, `tests/unit/stageTranslation.spec.ts` e `tests/e2e/auth.spec.ts` = `55/55` aprovados)
 
 ### Fase F5 — Frontend CRUDs, Dashboard & Settings
-- [ ] Implementar páginas `Companies`, `JobOpenings`, `Candidates`, `Processes` (Kanban + Lista + Timeline + Oferta), `Users`
-- [ ] Implementar `Dashboard` com filtros globais, KPIs, 4 gráficos acessíveis e Processos Críticos
-- [ ] Implementar `Settings` com todas as 9 abas (incluindo `PermissionsManager` e `SecurityDashboard`)
-- [ ] Cobrir componentes com Playwright CT e fluxos completos com Playwright E2E
+- [x] Implementar páginas `Companies`, `JobOpenings`, `Candidates`, `Processes` (Kanban + Lista + Timeline + Oferta), `Users`
+- [x] Implementar `Dashboard` com filtros globais, KPIs, 4 gráficos acessíveis e Processos Críticos
+- [x] Implementar `Settings` com todas as 9 abas (incluindo `PermissionsManager` e `SecurityDashboard`)
+- [x] Cobrir componentes com Playwright CT e fluxos completos com Playwright E2E
 
 ### Fase F6 — Docker, CI/CD, Auditoria Final & Produção
 - [ ] Criar Dockerfiles (`backend`, `frontend`) e `docker-compose.yml` (sem MSSQL)

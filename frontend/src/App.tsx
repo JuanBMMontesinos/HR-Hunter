@@ -8,11 +8,18 @@ import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider } from './contexts/AuthContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import { ToastProvider } from './contexts/ToastContext';
-import { ModuleShellPage } from './pages/ModuleShellPage';
 import { AccessDenied } from './pages/auth/AccessDenied';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { Login } from './pages/auth/Login';
 import { ResetPassword } from './pages/auth/ResetPassword';
+import { CandidatesPage } from './pages/candidates/CandidatesPage';
+import { CompaniesPage } from './pages/companies/CompaniesPage';
+import { DashboardPage } from './pages/dashboard/DashboardPage';
+import { JobOpeningsPage } from './pages/job-openings/JobOpeningsPage';
+import { ProcessesPage } from './pages/processes/ProcessesPage';
+import { ProfilePage } from './pages/profile/ProfilePage';
+import { SettingsPage } from './pages/settings/SettingsPage';
+import { UsersPage } from './pages/users/UsersPage';
 
 function LanguageSync() {
   const { i18n } = useTranslation();
@@ -50,11 +57,7 @@ export function App() {
                   path="/dashboard"
                   element={
                     <RoleProtectedRoute requiredPermission={['dashboard', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="dashboard"
-                        titleKey="nav.dashboard"
-                        subtitleKey="pages.dashboardSubtitle"
-                      />
+                      <DashboardPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -62,11 +65,7 @@ export function App() {
                   path="/companies"
                   element={
                     <RoleProtectedRoute requiredPermission={['companies', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="companies"
-                        titleKey="nav.companies"
-                        subtitleKey="pages.companiesSubtitle"
-                      />
+                      <CompaniesPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -74,11 +73,7 @@ export function App() {
                   path="/job-openings"
                   element={
                     <RoleProtectedRoute requiredPermission={['job_openings', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="job_openings"
-                        titleKey="nav.jobOpenings"
-                        subtitleKey="pages.jobOpeningsSubtitle"
-                      />
+                      <JobOpeningsPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -86,11 +81,7 @@ export function App() {
                   path="/candidates"
                   element={
                     <RoleProtectedRoute requiredPermission={['candidates', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="candidates"
-                        titleKey="nav.candidates"
-                        subtitleKey="pages.candidatesSubtitle"
-                      />
+                      <CandidatesPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -98,11 +89,7 @@ export function App() {
                   path="/processes"
                   element={
                     <RoleProtectedRoute requiredPermission={['processes', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="processes"
-                        titleKey="nav.processes"
-                        subtitleKey="pages.processesSubtitle"
-                      />
+                      <ProcessesPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -110,11 +97,7 @@ export function App() {
                   path="/users"
                   element={
                     <RoleProtectedRoute requiredPermission={['users', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="users"
-                        titleKey="nav.users"
-                        subtitleKey="pages.usersSubtitle"
-                      />
+                      <UsersPage />
                     </RoleProtectedRoute>
                   }
                 />
@@ -122,24 +105,11 @@ export function App() {
                   path="/settings"
                   element={
                     <RoleProtectedRoute requiredPermission={['settings', 'read']}>
-                      <ModuleShellPage
-                        moduleKey="settings"
-                        titleKey="nav.settings"
-                        subtitleKey="pages.settingsSubtitle"
-                      />
+                      <SettingsPage />
                     </RoleProtectedRoute>
                   }
                 />
-                <Route
-                  path="/profile"
-                  element={
-                    <ModuleShellPage
-                      moduleKey="profile"
-                      titleKey="nav.profile"
-                      subtitleKey="pages.profileSubtitle"
-                    />
-                  }
-                />
+                <Route path="/profile" element={<ProfilePage />} />
               </Route>
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />

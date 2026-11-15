@@ -1,7 +1,7 @@
 # Segurança, Autenticação & Permissões RBAC — HR Hunter (v2.0)
 
 **Última Atualização:** 2026-11-15  
-**Escopo:** Fases 2 e 4 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics, Retenção & Segurança no Frontend  
+**Escopo:** Fases 2, 4 e 5 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics, Retenção & Interface Administrativa de Segurança  
 
 ---
 
@@ -88,3 +88,19 @@ Quando `authorize(resource, action)` ou `requireAdmin` nega acesso (`403 FORBIDD
   - `safeSetElementHtml` prioriza `Element.prototype.setHTML` nativo quando disponível e utiliza `dompurify` carregado sob demanda com `ALLOW_ARIA_ATTR: false`, `ALLOW_DATA_ATTR: false` e `KEEP_CONTENT: false` na pré-visualização do `RichTextEditor`.
 - **Política de Senha & Formulários (`PasswordStrengthMeter.tsx`, `LoginForm.tsx`):**
   - Medidor interativo espelha as 5 regras de `backend/utils/passwordPolicy.js`, formulários empregam atributos padrão de gerenciadores de senha (`autocomplete="username"` / `"current-password"` / `"new-password"`) e tratam retornos `401`, `403`, `423 AUTH_004` e `429 AUTH_RATE_LIMIT`.
+
+---
+
+## 7. Controles de Segurança na Interface Administrativa (Fase 5 — `Settings`)
+
+- **Mascaramento de Chaves Sensíveis (`GeneralSettingsTab.tsx`):**
+  - Chaves marcadas com `isSensitive=true` são recebidas e exibidas com valor mascarado (`********`) na interface e enviadas apenas quando explicitamente alteradas pelo administrador, evitando sobrescrita acidental de segredos ou exposição em respostas JSON.
+- **Matriz Interativa RBAC (`PermissionsManagerTab.tsx`):**
+  - Permite editar permissões `7 recursos × 4 ações` para `Recrutador` e `Consultor` por meio de `/api/v1/permissions/roles/:role`, mantendo o perfil `Admin` bloqueado como somente leitura para impedir perda acidental de acesso administrativo.
+  - Toda alteração dispara geração automática de evento `PERMISSION_CHANGE` no `audit_log` (inspecionável diretamente na própria aba e em `AuditLogTab.tsx`) e invalidação imediata do cache RBAC no servidor.
+- **Painel de Segurança, Alertas e Relatórios (`SecurityDashboardTab.tsx` & `securityAdminService.ts`):**
+  - Exibe alertas ativos de segurança com ações de resolução/descarte, pontuação de risco (`0..100`) via barra `<progress>` nativa acessível e atualização automática configurável (30s).
+  - Exportações CSV/PDF (`/api/v1/exports/*`) e snapshots lógicos (`BackupSnapshotTab.tsx`, `/api/v1/settings/backup`) são baixados via `apiClient` autenticado (`responseType: 'blob'`), sem exposição de tokens em URLs ou query strings.
+- **Retenção e Reset Forçado de Senha (`SecurityAndRetentionTab.tsx` & `UsersPage.tsx`):**
+  - Permite configurar políticas de retenção, consultar registros elegíveis, simular com `Dry-Run` ou executar expurgos auditados em `retention_execution_log`; administradores podem realizar reset de senha de outros usuários respeitando validação da política de força (`PasswordStrengthMeter.tsx`).
+- Documentação completa das 9 abas: [SETTINGS_MODULE.md](./SETTINGS_MODULE.md).

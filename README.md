@@ -2,7 +2,7 @@
 
 Plataforma web de gestão de recrutamento e seleção (ATS/CRM) construída com **React + Vite + TypeScript**, **Node.js + Express**, **Supabase (PostgreSQL)** e suíte unificada de testes com **Playwright**.
 
-> **Status Atual:** Fase `F4` concluída (Design System `design-system.json`, biblioteca de componentes acessíveis + `MainLayout`, i18n completo com `stageTranslation.ts`, `AuthContext` com refresh cookie `HttpOnly` + single-flight `401`, `PermissionsContext` + `RoleProtectedRoute` sem race condition, telas `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied` e `55/55` testes Playwright aprovados). Próxima etapa: **Fase `F5`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
+> **Status Atual:** Fase `F5` concluída (CRUDs completos de `Companies`, `JobOpenings`, `Candidates`, `Users` e `Profile`, Pipeline Kanban acessível de `Processes` com propostas/timeline, `Dashboard` analítico com 7 KPIs + 4 gráficos/tabelas acessíveis, módulo administrativo `Settings` com **9 abas** WAI-ARIA + documentação dedicada e `61/61` testes Playwright aprovados — `22` Component Tests + `39` Unit/API/E2E). Próxima etapa: **Fase `F6`** (Docker/CI/CD & Produção) conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
 
 ## Stack Implementada
 
@@ -40,20 +40,21 @@ HR-Hunter/
 │   ├── DATA_MAPPING.md                        # Mapeamento snake_case <-> camelCase e normalizações
 │   ├── PLANO_MESTRE.md                        # Plano mestre v2.0 e roadmap F0–F6
 │   ├── SECURITY_AND_PERMISSIONS.md            # Auth, rate limit, RBAC granular, alertas e retenção
+│   ├── SETTINGS_MODULE.md                     # Guia completo das 9 abas administrativas (Settings)
 │   ├── SETUP.md                               # Guia completo de instalação, env e execução
 │   └── TESTING.md                             # Guia e cobertura da suíte unificada Playwright
 ├── frontend/
 │   ├── playwright/                            # Harness do Playwright Component Testing
 │   ├── src/
-│   │   ├── components/                        # auth/, common/ e layout/ (Header, Sidebar, MainLayout)
+│   │   ├── components/                        # auth/, common/, layout/, dashboard/, processes/ e settings/
 │   │   ├── contexts/                          # AuthContext, PermissionsContext, ToastContext
 │   │   ├── hooks/                             # usePermissions
 │   │   ├── i18n/                              # react-i18next (pt-BR, en-US)
-│   │   ├── pages/                             # auth/ e ModuleShellPage
-│   │   ├── services/                          # api.ts (Axios single-flight 401), authService.ts
+│   │   ├── pages/                             # auth/, dashboard/, companies/, job-openings/, candidates/, processes/, users/, profile/, settings/
+│   │   ├── services/                          # api.ts + auth, company, jobOpening, candidate, process, user, dashboard, settings, securityAdmin
 │   │   ├── styles/                            # variables.css + globals.css
-│   │   ├── types/                             # auth.ts, common.ts
-│   │   ├── utils/                             # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts
+│   │   ├── types/                             # auth.ts, common.ts, domain.ts
+│   │   ├── utils/                             # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts, formatters.ts
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── tests/ct/                              # Testes unitários de componentes React (Playwright CT) + harnesses/
@@ -106,6 +107,7 @@ npm test
 - [Arquitetura do Sistema](docs/ARCHITECTURE.md)
 - [Documentação da API (`/api/v1`)](docs/API.md)
 - [Segurança, Autenticação & Permissões RBAC](docs/SECURITY_AND_PERMISSIONS.md)
+- [Módulo de Configurações Administrativas (Settings)](docs/SETTINGS_MODULE.md)
 - [Banco de Dados (Supabase PostgreSQL)](docs/DATABASE.md)
 - [Mapeamento de Dados (`snake_case` ↔ `camelCase`)](docs/DATA_MAPPING.md)
 - [Guia de Testes Automatizados (Playwright)](docs/TESTING.md)

@@ -4,6 +4,23 @@ Todas as mudanças notáveis do projeto **HR Hunter** serão documentadas neste 
 
 ## [Unreleased]
 
+### Added — Fase F5 (Frontend CRUDs, Pipeline Kanban, Dashboard Analítico & Settings Admin)
+- **Contratos Tipados, Formatadores & Serviços (`frontend/src/types/domain.ts`, `utils/formatters.ts`, `services/*.ts`):**
+  - DTOs e payloads completos cobrindo Empresas, Vagas, Candidatos (+ sub-recursos e CSV), Processos (Kanban, Propostas, Timeline), Usuários, Dashboard, Settings, Segurança/Alertas, Retenção LGPD, Matriz RBAC e Backup.
+  - Utilitários de formatação PT-BR/EN-US (CNPJ, CPF opcional, CEP, telefone, moeda, datas) e serviços HTTP dedicados (respeitando `limit <= 20` em `companyService.ts` e downloads autenticados via `responseType: 'blob'` em `securityAdminService.ts`).
+- **Módulos de Negócio (`CompaniesPage`, `JobOpeningsPage`, `CandidatesPage`, `UsersPage`, `ProfilePage`):**
+  - Páginas CRUD completas com `FilterBar`, `DataTable`, `StatusBadge`, `ConfirmModal` reutilizável e feedback via `ToastContext`.
+  - Bloqueio estrutural de edição em vagas `Preenchida` + modal de detalhes com abas (`JobDetailsModal`), formulário multiaba de candidatos com **CPF opcional** e importação em massa CSV, força de senha + reset administrativo em `UsersPage` e sincronia dinâmica de idioma em `ProfilePage`.
+- **Pipeline Kanban (`ProcessesPage`, `ProcessKanban`, `ProcessDetailModal`):**
+  - Alternância Kanban (padrão) e Tabela com tradução automática das colunas via `stageTranslation.ts` e isolamento de renderização por `content-visibility: auto` (`contain-intrinsic-size` + fallback `@supports not`).
+  - Drag-and-drop nativo e botões acessíveis de avanço/retorno por teclado com anúncios `role="status"` apenas em mudança efetiva; avaliação 1–5 estrelas, criação/decisão de propostas (`advanceToHired`), rejeição e linha do tempo.
+- **Dashboard Analítico (`DashboardPage`, `KpiCard`, `AccessibleCharts`, `CriticalProcessesCard`):**
+  - Filtros globais de período/empresa/departamento, 7 KPIs, 4 gráficos SVG com alternância acessível para tabela de dados, Top 5 empresas contratantes, processos críticos e atualização automática configurável (5 min).
+- **Configurações Administrativas — 9 Abas (`SettingsPage`, `components/settings/*`, `Tabs.tsx`):**
+  - Componente `Tabs` WAI-ARIA (`selectionMode="activation"`, sem `aria-controls` redundante, painéis inativos `hidden`, indicador por borda inferior para alto contraste).
+  - Implementadas todas as 9 abas: Geral (mascaramento `********`), Etapas & Funis, E-mail & Templates, Segurança & Retenção (Dry-Run LGPD + execução paralela de contagens em `retentionService.js`), Audit Log (JSON diff), Login History, Segurança/Alertas (`<progress>` nativo de risco, resolução e exports CSV/PDF autenticados), Permissões RBAC (trava somente leitura em `Admin`) e Backup/Snapshot JSON/SQL. Documentado em [docs/SETTINGS_MODULE.md](docs/SETTINGS_MODULE.md).
+- **Testes & Correções:** `22/22` Component Tests (`Phase5Widgets.spec.tsx` + F4) e `39/39` Root Unit/API/E2E (`crud-and-kanban.spec.ts`, `dashboard-and-settings.spec.ts` etc.), totalizando `61/61` testes Playwright aprovados e `0` registros `pw%` residuais no Supabase.
+
 ### Added — Fase F4 (Frontend Base, Design System, Auth, RBAC Granular & Componentes Comuns)
 - **Design System & Componentes Comuns (`frontend/src/styles/globals.css`, `frontend/src/components/common/`):**
   - Mantidos `Button` (+ variante `danger` / `size`), `StatusBadge` (+ variante `info`), `LanguageSwitcher` e `PageHeader`.

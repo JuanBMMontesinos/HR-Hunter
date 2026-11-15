@@ -50,16 +50,17 @@ npm run build:frontend
 
 ---
 
-## 4. Cobertura Atual (Fase 4 — Verificada)
+## 4. Cobertura Atual (Fase 5 — Verificada)
 
-- **Component Unit Tests (`npm run test:ct`) — `18/18` aprovados:**
+- **Component Unit Tests (`npm run test:ct`) — `22/22` aprovados (Fases 4 e 5):**
+  - Inclui `Phase5Widgets.spec.tsx` (4 cenários: navegação por abas WAI-ARIA `Tabs`, KPIs/gráficos SVG acessíveis com alternância para tabela e `CriticalProcessesCard`, movimentação acessível entre colunas no `ProcessKanban` com anúncio via região viva e `ConfirmModal` + barra `<progress>` nativa) somado aos `18` cenários base de Fase 4.
   - `frontend/tests/ct/AuthAndRbac.spec.tsx` (6 testes): guarda anti-race-condition de `RoleProtectedRoute` (`permissionsLoading`), renderização autorizada vs redirecionamento para `/access-denied`, validação pós-interação + atributos `autocomplete` + botão mostrar/ocultar senha (`aria-pressed`) + alertas `401`/`423` no `LoginForm`, medidor `PasswordStrengthMeter` (5 regras) e filtragem dinâmica RBAC do `Sidebar`.
   - `frontend/tests/ct/CommonWidgets.spec.tsx` (6 testes): `DataTable` (`caption`, ordenação `<th scope="col">` com `aria-sort` e live status, skeletons de loading, estado vazio e paginação), `Modal` top-layer (`<dialog>` + tecla `Escape`) e `ToastViewport`, sanitização XSS no `RichTextEditor` (`<script>` e `onerror` removidos), `FilterBar` + `Select` + `Autocomplete`.
   - `frontend/tests/ct/Button.spec.tsx` (3 testes): variantes `solid`/`ghost`/`neutral`, click handler, estado `disabled`, foco por teclado e altura mínima WCAG `44px`.
   - `frontend/tests/ct/StatusBadge.spec.tsx` (1 teste): variantes semânticas `success`, `warning`, `danger` e `neutral`.
   - `frontend/tests/ct/LanguageSwitcher.spec.tsx` (1 teste): alternância `PT-BR` ↔ `EN-US`, persistência em `localStorage` (`hr_hunter_lang`) e atualização de `document.documentElement.lang`.
   - `frontend/tests/ct/PageHeader.spec.tsx` (1 teste): landmark `banner`, título, subtítulo, slot de ações e `LanguageSwitcher`.
-- **Root Suite (`npm test`) — `37/37` aprovados (`18` unit + `15` api + `4` e2e):**
+- **Root Suite (`npm test`) — `39/39` aprovados (`18` unit + `15` api + `6` e2e):**
   - `tests/unit/dbMapper.spec.ts` (4 testes): conversão `snake_case` → `camelCase` (incluindo dígitos como `last_24h`), mapeamento de coleções, normalização de strings vazias opcionais (`cpf`) e instâncias `Date` (ISO UTC ou `null`), e construção de `AppError`.
   - `tests/unit/auth.spec.ts` (3 testes): política de senha forte (`validatePasswordStrength`), assinatura/verificação JWT e hash SHA-256 determinístico (`tokenUtils`), proteção contra XSS e *CSV formula injection* (`sanitizer`).
   - `tests/unit/permissions.spec.ts` (4 testes): cálculo de risco `0..100` e classificação (`computeRiskScore`, `classifyRiskLevel`), recomendações automáticas (`buildRecommendations`), gatilhos de alerta (`evaluateAlertThresholds`: ≥5 usuário `HIGH`, ≥10 IP `CRITICAL`) e redação recursiva de segredos em `audit_log` (`redactSensitiveValues`).
@@ -76,8 +77,10 @@ npm run build:frontend
   - `tests/api/dashboard-and-settings.spec.ts` (1 teste): `/dashboard/kpis`, `/analytics`, `/critical-processes`, mascaramento `is_sensitive` em `/settings`, CRUD de etapas/funis/templates com sanitização XSS, proteção `is_system` (`403`), `/audit-log`, `/login-history` e `/backup`.
   - `tests/e2e/smoke.spec.ts` (1 teste): redirecionamento `/` → `/login`, badge vivo `Supabase Conectado` e troca dinâmica `PT-BR` ↔ `EN-US`.
   - `tests/e2e/auth.spec.ts` (3 testes): alerta em credenciais inválidas, login real como `Recrutador` no Supabase + filtragem dinâmica do `Sidebar` + bloqueio em `/users` (`/access-denied`) + persistência em reload via cookie `HttpOnly` + logout, e roundtrip UI completo de `/forgot-password` → `/reset-password?token=...` → login com nova senha (com limpeza em `afterAll`).
+  - `tests/e2e/crud-and-kanban.spec.ts` (1 teste): jornada completa de recrutamento via UI contra Supabase (`Empresas` → `Vagas` com bloqueio em `Preenchida` → `Candidatos` com CPF opcional + importação CSV → `Processos` Kanban + avaliação 5 estrelas + `Offer` + contratação + histórico → `Users` + `Profile`).
+  - `tests/e2e/dashboard-and-settings.spec.ts` (1 teste): verificação completa do `Dashboard` analítico (7 KPIs, 4 gráficos/tabelas, filtros globais) e operação das **9 abas** de `Settings` (etapas, dry-run de retenção, logs, relatório de risco com `<progress>`, trava `Admin` + alteração/restauração de permissões `Consultor` e snapshot lógico).
 
-**Total consolidado na Fase 4:** `55/55` testes Playwright aprovados (`0` falhas, `0` pulados).
+**Total consolidado na Fase 5:** `61/61` testes Playwright aprovados (`22` Component Tests + `18` Backend Unit + `15` API Integration + `6` E2E; `0` falhas, `0` pulados).
 
 ---
 

@@ -1,6 +1,6 @@
 # Arquitetura do Sistema — HR Hunter (v2.0)
 
-**Versão:** 2.0 (Fase 4 — Frontend Base, Design System, Auth & RBAC Granular)  
+**Versão:** 2.0 (Fase 5 — CRUDs, Kanban, Dashboard Analítico & Módulo Settings)  
 **Última Atualização:** 2026-11-15  
 
 ---
@@ -58,6 +58,7 @@ HR-Hunter/
 │   ├── DATA_MAPPING.md
 │   ├── PLANO_MESTRE.md
 │   ├── SECURITY_AND_PERMISSIONS.md
+│   ├── SETTINGS_MODULE.md
 │   ├── SETUP.md
 │   └── TESTING.md
 ├── frontend/
@@ -70,11 +71,11 @@ HR-Hunter/
 │   │   ├── contexts/            # AuthContext, PermissionsContext, ToastContext
 │   │   ├── hooks/               # usePermissions
 │   │   ├── i18n/                # react-i18next (pt-BR, en-US)
-│   │   ├── pages/               # auth (Login, ForgotPassword, ResetPassword, AccessDenied) + ModuleShellPage
-│   │   ├── services/            # api.ts (Axios single-flight 401 + notificações), authService.ts
+│   │   ├── pages/               # auth/*, dashboard/, companies/, job-openings/, candidates/, processes/, users/, profile/, settings/
+│   │   ├── services/            # api.ts (single-flight 401), auth, company, jobOpening, candidate, process, user, dashboard, settings, securityAdmin
 │   │   ├── styles/              # variables.css (design-system.json) + globals.css
-│   │   ├── types/               # auth.ts, common.ts
-│   │   ├── utils/               # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts
+│   │   ├── types/               # auth.ts, common.ts, domain.ts
+│   │   ├── utils/               # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts, formatters.ts
 │   │   ├── App.tsx              # BrowserRouter + guards RBAC + ToastViewport
 │   │   └── main.tsx
 │   ├── tests/ct/                # Testes unitários de componentes React (Playwright CT) + harnesses/
@@ -134,3 +135,25 @@ HR-Hunter/
    - `DataTable` usa `@container (width < 600px)` para cards empilhados, `<th scope="col">` ordenáveis com `aria-sort` e anúncios `role="status"`.
    - `RichTextEditor` sanitiza HTML via `Element.prototype.setHTML` nativo quando suportado, com fallback para `dompurify`.
    - `stageTranslation.ts` traduz as 9 etapas padrão PT-BR ↔ EN-US preservando etapas customizadas intactas.
+
+---
+
+## 5. Camada de Aplicação Frontend — Módulos de Negócio, Kanban, Dashboard e Settings (Fase 5)
+
+1. **Módulos Operacionais (`CompaniesPage`, `JobOpeningsPage`, `CandidatesPage`, `UsersPage`, `ProfilePage`):**
+   - Listagens utilizam `FilterBar`, `DataTable` paginado (limite máximo de 20 registros/página respeitado em `companyService.ts`), `StatusBadge`, `ConfirmModal` e feedback imediato via `NotificationContext`.
+   - `JobOpeningsPage` bloqueia edição estrutural quando a vaga atinge status `Preenchida` e oferece visualização detalhada em abas (`JobDetailsModal`: informações, candidatos e estatísticas).
+   - `CandidatesPage` reúne formulário em abas (Dados Pessoais com CPF opcional, Experiências, Formação Acadêmica e Habilidades), importação em massa via CSV e vínculo direto com processos seletivos.
+   - `UsersPage` integra `PasswordStrengthMeter` para criação/edição e reset administrativo de senha, além de inspeção de atividades (`ActivityModal`) e exclusão lógica; `ProfilePage` sincroniza a preferência de idioma em tempo real com `i18next`.
+
+2. **Processos Seletivos (`ProcessesPage`, `ProcessKanban`, `ProcessDetailModal`):**
+   - Alternância fluida entre visualização **Kanban** (padrão) e **Tabela**, com colunas dinâmicas traduzidas via `stageTranslation.ts` e isolamento de renderização por `content-visibility: auto` com `contain-intrinsic-size` (e fallback `@supports not` para navegadores legados).
+   - Suporta movimentação híbrida: drag-and-drop nativo HTML5 e botões acessíveis de avanço/retorno por teclado em cada cartão, anunciando mudanças de posição exclusivamente quando ocorrem em região `role="status"`.
+   - `ProcessDetailModal` concentra avaliação (1 a 5 estrelas), registro de proposta (`Offer`) com promoção automática para `Contratado` (`advanceToHired`), rejeição com justificativa e linha do tempo de transições.
+
+3. **Dashboard Analítico (`DashboardPage`, `KpiCard`, `AccessibleCharts`, `CriticalProcessesCard`):**
+   - Filtros globais de período, empresa e departamento atualizando 7 KPIs, Top 5 empresas contratantes, processos críticos e ações rápidas, com atualização automática opcional a cada 5 minutos.
+   - Todos os 4 gráficos SVG responsivos dispõem de toggle interativo entre exibição visual (`Chart`) e tabela de dados acessível (`Table`) via leitor de tela e teclado.
+
+4. **Configurações Administrativas (`SettingsPage` & `components/settings/*`):**
+   - Arquitetura de 9 abas WAI-ARIA (`Tabs.tsx`) no modo `selectionMode="activation"`, evitando buscas HTTP até confirmação da aba ativa; detalhes completos em [SETTINGS_MODULE.md](./SETTINGS_MODULE.md).

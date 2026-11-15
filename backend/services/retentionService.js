@@ -49,29 +49,30 @@ async function listPolicies() {
      ORDER BY config_key ASC`,
   );
 
-  const items = [];
-  for (const row of res.rows) {
-    const def = POLICY_DEFINITIONS[row.config_key];
-    const days = Number(row.config_value) || (def ? def.defaultDays : 90);
-    let eligibleForCleanup = 0;
+  const items = await Promise.all(
+    res.rows.map(async (row) => {
+      const def = POLICY_DEFINITIONS[row.config_key];
+      const days = Number(row.config_value) || (def ? def.defaultDays : 90);
+      let eligibleForCleanup = 0;
 
-    if (def) {
-      const countRes = await query(
-        `SELECT COUNT(*)::INT AS c
-         FROM ${def.table}
-         WHERE ${def.dateColumn} < NOW() - ($1 || ' days')::interval
-         ${def.extraCondition}`,
-        [String(days)],
-      );
-      eligibleForCleanup = countRes.rows[0].c;
-    }
+      if (def) {
+        const countRes = await query(
+          `SELECT COUNT(*)::INT AS c
+           FROM ${def.table}
+           WHERE ${def.dateColumn} < NOW() - ($1 || ' days')::interval
+           ${def.extraCondition}`,
+          [String(days)],
+        );
+        eligibleForCleanup = countRes.rows[0].c;
+      }
 
-    items.push({
-      ...mapRow(row),
-      days,
-      eligibleForCleanup,
-    });
-  }
+      return {
+        ...mapRow(row),
+        days,
+        eligibleForCleanup,
+      };
+    }),
+  );
 
   return items;
 }
