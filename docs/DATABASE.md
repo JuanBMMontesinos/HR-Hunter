@@ -109,3 +109,13 @@ node database/scripts/inspect.js
 - **`fn_get_dashboard_analytics(p_start_date, p_end_date, p_company_id)`**
 - **`fn_get_critical_processes(p_company_id)`**
 - **`fn_move_to_next_stage(p_process_id, p_new_stage_id, p_feedback, p_rating, p_responsible_user_id, p_attached_documents)`**
+
+---
+
+## 6. Integração com API & Estratégia de Backup (Fase 3)
+
+- **Consumo na API (`backend/services/`):**
+  - `dashboardService.js` invoca diretamente `fn_get_dashboard_kpis`, `fn_get_dashboard_analytics` (3 parâmetros: `p_start_date`, `p_end_date`, `p_company_id`), `fn_get_candidates_by_stage`, `fn_get_critical_processes` e consulta a view `vw_recruitment_metrics`.
+  - `processService.js` utiliza `fn_move_to_next_stage` nas transições de etapa (`/next-stage`, `/reject`, `/offer`, `/offer/:offerId`), disparando o trigger `trg_sync_process_stage` que conclui automaticamente processos em etapas terminais (`Contratado` / `Rejeitado`).
+  - `jobOpeningService.js` utiliza `fn_get_candidates_by_stage` para detalhamento analítico por vaga (`/job-openings/:id/analytics`).
+- **Backup Gerenciado + Snapshot Lógico:** além dos backups nativos gerenciados pela plataforma Supabase, administradores dispõem do endpoint `POST /api/v1/settings/backup` (`settingsService.js`) para extrair snapshots lógicos sob demanda em formato `json` ou `sql` (com trilha registrada em `audit_log`).

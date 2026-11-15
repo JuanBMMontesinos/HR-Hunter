@@ -38,11 +38,13 @@ test.describe('Backend Unit — dbMapper & ErrorCodes', () => {
     expect(mapRows(null as unknown as [])).toEqual([]);
   });
 
-  test('normalizes empty optional strings (such as optional CPF) to null', () => {
+  test('normalizes empty optional strings (such as optional CPF) and Dates to null or ISO strings', () => {
     expect(normalizeOptionalString('')).toBeNull();
     expect(normalizeOptionalString('   ')).toBeNull();
     expect(normalizeOptionalString(undefined)).toBeNull();
     expect(normalizeOptionalString(' 123.456.789-00 ')).toBe('123.456.789-00');
+    expect(normalizeOptionalString(new Date('2026-11-15T12:00:00.000Z'))).toBe('2026-11-15T12:00:00.000Z');
+    expect(normalizeOptionalString(new Date('invalid-date'))).toBeNull();
   });
 
   test('constructs AppError with standardized error codes', () => {

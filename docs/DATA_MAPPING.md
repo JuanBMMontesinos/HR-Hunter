@@ -68,3 +68,24 @@ A conversão automática entre linhas do PostgreSQL (`snake_case`) e payloads JS
 - `full_name` (`fullName`), `email`, `phone`, `cpf`, `date_birth` (`dateBirth`), `gender`
 - `desired_position` (`desiredPosition`), `desired_salary` (`desiredSalary`), `available_date` (`availableDate`)
 - `cv_file_path` (`cvFilePath`), `linkedin`, `github`, `portfolio`, `notes`, `status`
+
+---
+
+## 5. Mapeamentos Adicionados na Fase 3 (Processos, Ofertas, Funis & Configurações)
+
+### Normalização de Datas Joi → PostgreSQL (`backend/utils/dbMapper.js`)
+O middleware `validationMiddleware.js` converte campos `Joi.date().iso()` (como `openedAt`, `startDate`, `endDate`, `scheduledAt`) para instâncias `Date` antes da camada de serviço. A função `normalizeOptionalString(value)` trata explicitamente `value instanceof Date`, convertendo datas válidas via `value.toISOString()` (e datas inválidas para `null`), evitando erros `22007` no PostgreSQL.
+
+### Processos, Etapas & Ofertas (`recruitment_processes`, `process_stages`, `offers`)
+- `job_opening_id` (`jobOpeningId`), `candidate_id` (`candidateId`), `current_stage_id` (`currentStageId`), `start_date` (`startDate`), `end_date` (`endDate`)
+- `process_id` (`processId`), `stage_id` (`stageId`), `entered_at` (`enteredAt`), `exited_at` (`exitedAt`), `scheduled_at` (`scheduledAt`), `attached_documents` (`attachedDocuments`), `responsible_user_id` (`responsibleUserId`)
+- `position`, `salary`, `benefits`, `conditions`, `sent_at` (`sentAt`), `viewed_at` (`viewedAt`), `response_at` (`responseAt`), `status`
+
+### Templates de Etapa, Funis, E-mails & Configurações
+- **Etapas (`recruitment_stage_template`):** `stage_name` (`stageName`), `stage_order` (`stageOrder`), `is_default` (`isDefault`), `is_terminal` (`isTerminal`)
+- **Funis (`stage_funnels` / `stage_funnel_items`):** `funnel_id` (`funnelId`), `funnel_name` (`funnelName`), `is_default` (`isDefault`), `stage_id` (`stageId`), `stage_order` (`stageOrder`)
+- **E-mail Templates (`email_templates`):** `template_key` (`templateKey`), `subject`, `body_html` (`bodyHtml`), `variables`, `is_active` (`isActive`), `is_system` (`isSystem`)
+- **Configurações (`configurations`):** `config_key` (`configKey`), `config_value` (`configValue` — mascarada como `'********'` quando `is_sensitive = TRUE`), `description`, `category`, `is_sensitive` (`isSensitive`)
+
+### Aliases de Contrato na API
+- **Vagas (`/api/v1/job-openings`):** `jobOpeningValidator.js` aceita `salaryMin`/`minSalary` e `salaryMax`/`maxSalary`, normalizando internamente para `minSalary`/`maxSalary` antes da persistência em `min_salary`/`max_salary`.

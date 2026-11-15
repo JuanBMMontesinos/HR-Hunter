@@ -1,6 +1,6 @@
 # Arquitetura do Sistema — HR Hunter (v2.0)
 
-**Versão:** 2.0 (Fase 2 — Auth, RBAC Granular & Segurança)  
+**Versão:** 2.0 (Fase 3 — CRUDs Core, Dashboard Analytics & Settings)  
 **Última Atualização:** 2026-11-15  
 
 ---
@@ -19,7 +19,7 @@ HR-Hunter/
 │   │   ├── database.js          # Pool PostgreSQL (pg) + healthCheck + withTransaction
 │   │   ├── env.js               # Carregamento e defaults de variáveis de ambiente
 │   │   └── swagger.js           # Especificação OpenAPI 3.0 (/api/docs)
-│   ├── controllers/             # Auth, Permissions, SecurityAlerts, Notifications, Exports, Analytics, Retention
+│   ├── controllers/             # Auth, Permissions, SecurityAlerts, Notifications, Exports, Analytics, Retention, Company, JobOpening, Candidate, Process, User, Dashboard, Settings
 │   ├── middleware/
 │   │   ├── auditMiddleware.js   # Registro assíncrono em audit_log + metadados IP/UA
 │   │   ├── authenticate.js      # Validação JWT + verificação de usuário ativo
@@ -28,16 +28,19 @@ HR-Hunter/
 │   │   ├── errorHandler.js      # Resposta padrão de erros com códigos customizados
 │   │   ├── rateLimiter.js       # Limite API geral, loginLimiter e exportLimiter (10/h)
 │   │   └── validationMiddleware.js # Validação Joi declarativa
-│   ├── routes/                  # health, auth, permissions, securityAlerts, notifications, exports, analytics, retention
+│   ├── routes/                  # health, auth, permissions, securityAlerts, notifications, exports, analytics, retention, companies, jobOpenings, candidates, processes, users, dashboard, settings
 │   ├── services/                # Regras de negócio transacionais integradas ao Supabase
 │   ├── utils/
-│   │   ├── dbMapper.js          # Conversão snake_case <-> camelCase e normalizações
+│   │   ├── csvParser.js         # Parser CSV RFC-4180 (BOM UTF-8 e delimitador , ou ;)
+│   │   ├── dbMapper.js          # Conversão snake_case <-> camelCase e normalizações (inclui Date)
 │   │   ├── errorCodes.js        # Enum ErrorCodes e classe AppError
 │   │   ├── logger.js            # Winston structured logger
 │   │   ├── passwordPolicy.js    # Validação de complexidade de senha
-│   │   ├── sanitizer.js         # Proteção XSS HTML e CSV formula injection
+│   │   ├── queryHelpers.js      # Paginação, SqlFilterBuilder, buildDynamicUpdate e handlePgError
+│   │   ├── responseHelper.js    # Envelope padrão de resposta (sendSuccess, actorMeta)
+│   │   ├── sanitizer.js         # Proteção XSS HTML, renderTemplate e CSV formula injection
 │   │   └── tokenUtils.js        # JWT sign/verify, tokens opacos SHA-256 e cookie options
-│   ├── validators/              # Schemas Joi (authValidator.js, securityValidator.js)
+│   ├── validators/              # Schemas Joi (auth, security, company, jobOpening, candidate, process, user, dashboardAndSettings)
 │   ├── app.js                   # App Express (exportável para testes/servidor)
 │   ├── server.js                # Bootstrap HTTP, cron scheduler e graceful shutdown
 │   └── package.json
@@ -98,3 +101,13 @@ HR-Hunter/
 4. **Design System & Acessibilidade (`design-system.json`):**
    - Tokens CSS em `frontend/src/styles/variables.css`
    - Foco visível com `--color-secondary` (`#3C7EFF`), skip link para conteúdo principal, alvos mínimos de `44px` e respeito a `prefers-reduced-motion`.
+
+---
+
+## 3. Evolução Arquitetural (Fases 2 e 3)
+
+1. **Auth, RBAC Granular & Segurança (Fase 2):** `authService.js`, `tokenUtils.js`, `passwordPolicy.js`, `permissionService.js`, `authorize.js`, `auditMiddleware.js`, `securityAlertService.js`, `securityAnalyticsService.js`, `notificationService.js`, `exportService.js`, `retentionService.js` e `sanitizer.js`.
+2. **CRUDs Core, Analytics & Configurações (Fase 3):**
+   - **Domínio:** `companyService.js`, `jobOpeningService.js`, `candidateService.js`, `processService.js`, `userService.js`, `dashboardService.js` e `settingsService.js` (com respectivos controllers e validadores Joi).
+   - **Utilitários Compartilhados:** `queryHelpers.js` (`parsePagination`, `SqlFilterBuilder`, `buildDynamicUpdate`, `handlePgError`), `csvParser.js` (parser RFC-4180 com autodetecção `,`/`;` e BOM) e `responseHelper.js` (`sendSuccess`, `actorMeta`).
+   - **Integridade Transacional:** criação de candidatos com sub-recursos e processos seletivos em `withTransaction`, serialização de queries por cliente `pg` e leitura pós-`COMMIT`.

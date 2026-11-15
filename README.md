@@ -2,7 +2,7 @@
 
 Plataforma web de gestão de recrutamento e seleção (ATS/CRM) construída com **React + Vite + TypeScript**, **Node.js + Express**, **Supabase (PostgreSQL)** e suíte unificada de testes com **Playwright**.
 
-> **Status Atual:** Fase `F2` concluída (Auth JWT + cookie HttpOnly, RBAC granular, bloqueio/rate-limit, alertas automáticos de segurança, notificações, exports CSV/PDF, analytics `SecurityReports`, retenção `node-cron` e `27/27` testes Playwright aprovados). Próxima etapa: **Fase `F3`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
+> **Status Atual:** Fase `F3` concluída (CRUDs `/companies`, `/job-openings`, `/candidates` + import CSV, `/processes` Kanban/ofertas/timeline, `/users`, `/dashboard/*`, `/settings/*` + backup lógico e `37/37` testes Playwright aprovados). Próxima etapa: **Fase `F4`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
 
 ## Stack Implementada
 
@@ -22,12 +22,12 @@ HR-Hunter/
 │       └── playwright-unit-testing/SKILL.md   # Padrão unificado de testes Playwright
 ├── backend/
 │   ├── config/                                # env.js, database.js (pg pool + tx), swagger.js
-│   ├── controllers/                           # auth, permissions, securityAlerts, notifications, exports, analytics, retention
+│   ├── controllers/                           # auth, permissions, securityAlerts, notifications, exports, analytics, retention, companies, jobOpening, candidate, process, user, dashboard, settings
 │   ├── middleware/                            # authenticate, authorize, audit, cors, errorHandler, rateLimiter, validation
-│   ├── routes/                                # health, auth, permissions, security-alerts, notifications, exports, analytics, retention
-│   ├── services/                              # Regras de negócio transacionais (Auth, RBAC, Alertas, Exports, Analytics, Retenção)
-│   ├── utils/                                 # dbMapper, errorCodes, logger, passwordPolicy, sanitizer, tokenUtils
-│   ├── validators/                            # Schemas Joi (authValidator.js, securityValidator.js)
+│   ├── routes/                                # health, auth, permissions, security-alerts, notifications, exports, analytics, retention, companies, job-openings, candidates, processes, users, dashboard, settings
+│   ├── services/                              # Regras de negócio transacionais (Auth, RBAC, Alertas, Exports, Analytics, Retenção, CRUDs Core, Dashboard, Settings)
+│   ├── utils/                                 # csvParser, dbMapper, errorCodes, logger, passwordPolicy, queryHelpers, responseHelper, sanitizer, tokenUtils
+│   ├── validators/                            # Schemas Joi (auth, security, company, jobOpening, candidate, process, user, dashboardAndSettings)
 │   ├── app.js
 │   └── server.js
 ├── database/

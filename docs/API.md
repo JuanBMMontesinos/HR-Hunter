@@ -2,7 +2,7 @@
 
 **Base URL:** `/api/v1`  
 **Documentação Interativa Swagger:** `GET /api/docs` (`GET /api/docs.json`)  
-**Última Atualização:** 2026-11-15 (Fase 2 — Auth, RBAC Granular & Segurança)  
+**Última Atualização:** 2026-11-15 (Fase 3 — CRUDs Core, Dashboard Analytics & Settings)  
 
 ---
 
@@ -108,5 +108,111 @@
 
 ---
 
-## 7. Próximas Fases (Planejadas)
-- **Fase 3:** CRUDs (`/companies`, `/job-openings`, `/candidates`, `/processes`, `/users`), Dashboard KPIs/Analytics e Settings/Backup lógico.
+## 7. Empresas (`/api/v1/companies`)
+
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/companies` | `companies:read` | Lista empresas paginadas (`limit <= 20`) com filtros por nome, status, setor e CNPJ |
+| `POST` | `/api/v1/companies` | `companies:create` | Cadastra nova empresa validando CNPJ único (`409` em duplicidade) |
+| `GET` | `/api/v1/companies/:id` | `companies:read` | Retorna detalhes da empresa e estatísticas de vagas/candidatos |
+| `PUT` | `/api/v1/companies/:id` | `companies:update` | Atualiza dados cadastrais da empresa |
+| `DELETE` | `/api/v1/companies/:id` | `companies:delete` | Inativa empresa (soft delete), bloqueando (`409`) se houver vagas abertas ou em progresso |
+
+---
+
+## 8. Vagas (`/api/v1/job-openings`)
+
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/job-openings` | `job_openings:read` | Lista vagas paginadas com filtros por empresa, status, nível, departamento, contrato e busca |
+| `POST` | `/api/v1/job-openings` | `job_openings:create` | Cria nova vaga (normaliza `salaryMin`/`minSalary`, `salaryMax`/`maxSalary`, `companyId`, `funnelId` e `openedAt`) |
+| `GET` | `/api/v1/job-openings/:id` | `job_openings:read` | Retorna detalhes da vaga, etapas do funil e indicadores |
+| `GET` | `/api/v1/job-openings/:id/candidates` | `job_openings:read` | Lista candidatos e processos vinculados à vaga |
+| `GET` | `/api/v1/job-openings/:id/analytics` | `job_openings:read` | Retorna funil por etapa e métricas analíticas da vaga |
+| `PUT` | `/api/v1/job-openings/:id` | `job_openings:update` | Atualiza vaga (bloqueia edição com `409` caso `status = 'Preenchida'`) |
+| `DELETE` | `/api/v1/job-openings/:id` | `job_openings:delete` | Remove ou cancela vaga (bloqueia com `409` se houver processos ativos) |
+
+---
+
+## 9. Candidatos (`/api/v1/candidates`)
+
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/candidates` | `candidates:read` | Lista candidatos paginados com filtros por nome, email, CPF, competência e status |
+| `POST` | `/api/v1/candidates` | `candidates:create` | Cria candidato em transação (`cpf` opcional permitindo múltiplos `NULL`) e sub-recursos iniciais |
+| `POST` | `/api/v1/candidates/import` | `candidates:create` | Importa candidatos em lote via CSV (`multipart/form-data` campo `file` ou JSON `{ csv }`, `,`/`;` e BOM) |
+| `GET` | `/api/v1/candidates/:id` | `candidates:read` | Retorna perfil completo com experiências, formação acadêmica, competências e processos |
+| `PUT` | `/api/v1/candidates/:id` | `candidates:update` | Atualiza dados cadastrais do candidato |
+| `DELETE` | `/api/v1/candidates/:id` | `candidates:delete` | Inativa candidato (soft delete), bloqueando (`409`) se houver processo seletivo ativo |
+| `GET/POST` | `/api/v1/candidates/:id/experience` | `candidates:read` / `update` | Lista ou adiciona experiência profissional ao candidato |
+| `PUT/DELETE` | `/api/v1/candidates/:id/experience/:expId` | `candidates:update` | Atualiza ou remove experiência profissional do candidato |
+| `GET/POST` | `/api/v1/candidates/:id/education` | `candidates:read` / `update` | Lista ou adiciona formação acadêmica ao candidato |
+| `PUT/DELETE` | `/api/v1/candidates/:id/education/:eduId` | `candidates:update` | Atualiza ou remove formação acadêmica do candidato |
+| `GET/POST` | `/api/v1/candidates/:id/skills` | `candidates:read` / `update` | Lista ou adiciona competência técnica ao candidato |
+| `PUT/DELETE` | `/api/v1/candidates/:id/skills/:skillId` | `candidates:update` | Atualiza ou remove competência técnica do candidato |
+
+---
+
+## 10. Processos Seletivos, Kanban & Ofertas (`/api/v1/processes`)
+
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/processes` | `processes:read` | Lista processos paginados com filtros por vaga, candidato, empresa, etapa e status |
+| `GET` | `/api/v1/processes/kanban` | `processes:read` | Retorna colunas ordenadas do funil com processos agrupados para visão Kanban |
+| `POST` | `/api/v1/processes` | `processes:create` | Inicia novo processo seletivo vinculando candidato e vaga na etapa inicial |
+| `GET` | `/api/v1/processes/:id` | `processes:read` | Retorna detalhes do processo com histórico de etapas e propostas |
+| `PUT` | `/api/v1/processes/:id` | `processes:update` | Atualiza status ou etapa de um processo seletivo |
+| `POST` | `/api/v1/processes/:id/next-stage` | `processes:update` | Avança processo para próxima etapa via `fn_move_to_next_stage` com feedback, nota e anexos |
+| `POST` | `/api/v1/processes/:id/reject` | `processes:update` | Rejeita candidato no processo com motivo e envio opcional de e-mail template |
+| `POST` | `/api/v1/processes/:id/offer` | `processes:update` | Registra proposta salarial (`201`) e move processo para etapa `Oferta` |
+| `PATCH` | `/api/v1/processes/:id/offer/:offerId` | `processes:update` | Atualiza status da proposta (`Aceita` com `advanceToHired` conclui processo como `Contratado`) |
+| `GET` | `/api/v1/processes/:id/timeline` | `processes:read` | Retorna linha do tempo consolidada (etapas, propostas e auditoria) |
+
+---
+
+## 11. Usuários (`/api/v1/users`)
+
+| Método | Endpoint | Acesso / Regra | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/users` | `Admin` | Lista usuários paginados com filtros por `role`, departamento e status |
+| `POST` | `/api/v1/users` | `Admin` | Cria novo usuário aplicando política de senha forte |
+| `GET` | `/api/v1/users/:id` | `Admin` ou próprio usuário | Retorna perfil do usuário |
+| `PUT` | `/api/v1/users/:id` | `Admin` ou próprio usuário | `Admin` altera qualquer campo; próprio usuário altera apenas nome, telefone e idioma (`403` nos demais) |
+| `DELETE` | `/api/v1/users/:id` | `Admin` | Desativa usuário (`is_active = false`) e revoga refresh tokens |
+| `GET` | `/api/v1/users/:id/activity` | `Admin` ou próprio usuário | Histórico recente de logins e ações de auditoria |
+| `POST` | `/api/v1/users/:id/reset-password` | `Admin` | Redefinição administrativa de senha com marcação opcional de troca no próximo login |
+
+---
+
+## 12. Dashboard Analítico (`/api/v1/dashboard`)
+
+| Método | Endpoint | Permissão | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/dashboard/kpis` | `dashboard:read` | KPIs consolidados executando `fn_get_dashboard_kpis` no Supabase |
+| `GET` | `/api/v1/dashboard/analytics` | `dashboard:read` | Séries para gráficos (departamento, status de vagas, evolução 30d, etapas e top 5 empresas) |
+| `GET` | `/api/v1/dashboard/critical-processes` | `dashboard:read` | Vagas abertas `> 30` dias e processos parados `> 15` dias via `fn_get_critical_processes` |
+
+---
+
+## 13. Configurações, Templates, Logs & Backup (`/api/v1/settings`)
+
+| Método | Endpoint | Acesso / Regra | Descrição |
+|---|---|---|---|
+| `GET` | `/api/v1/settings` | `Admin` | Lista configurações do sistema mascarando chaves `is_sensitive` |
+| `PUT` | `/api/v1/settings` | `Admin` | Atualiza configurações em transação com registro em `audit_log` |
+| `GET/POST` | `/api/v1/settings/stages` | Autenticado / `Admin` | Lista ou cria etapa de processo seletivo |
+| `PUT/DELETE` | `/api/v1/settings/stages/:id` | `Admin` | Atualiza ou remove etapa (bloqueia se possuir vínculos ativos) |
+| `GET/POST` | `/api/v1/settings/funnels` | Autenticado / `Admin` | Lista funis configurados ou cria funil com associação ordenada de etapas |
+| `PUT/DELETE` | `/api/v1/settings/funnels/:id` | `Admin` | Atualiza ou remove funil não padrão e sem vagas ativas |
+| `GET/POST` | `/api/v1/settings/email-templates` | `Admin` | Lista ou cria template HTML sanitizado contra XSS |
+| `PUT/DELETE` | `/api/v1/settings/email-templates/:id` | `Admin` | Atualiza template ou remove template customizado (protege `is_system = true` com `403`) |
+| `POST` | `/api/v1/settings/email-test` | `Admin` | Dispara e-mail de teste SMTP ou em modo simulado seguro |
+| `GET` | `/api/v1/settings/audit-log` | `Admin` | Lista `audit_log` paginado com filtros por usuário, ação, tabela e período |
+| `GET` | `/api/v1/settings/login-history` | `Admin` | Lista `login_history` paginado com filtros por usuário, sucesso e período |
+| `POST` | `/api/v1/settings/backup` | `Admin` | Gera snapshot lógico auditado (`json` ou `sql`) das tabelas de negócio |
+
+---
+
+## 14. Próximas Fases (Planejadas)
+- **Fase 4:** Frontend Core & Fluxo Principal (Login, Esqueci Senha, Dashboard KPIs + gráficos, Empresas, Vagas e Candidatos + Import CSV).
+- **Fase 5:** Kanban D&D, Timeline de Processos, Ofertas, Usuários, Permissões, Alertas, Retenção e Configurações completas no Frontend + CI/CD GitHub Actions.

@@ -103,7 +103,7 @@ npm run dev:frontend
 Endpoints principais disponíveis:
 - **Frontend:** `http://localhost:5173`
 - **Health Check (API + Supabase ping):** `http://localhost:3000/api/v1/health`
-- **Swagger / OpenAPI (27 rotas documentadas):** `http://localhost:3000/api/docs`
+- **Swagger / OpenAPI (`68` paths / `95` operações documentadas):** `http://localhost:3000/api/docs`
 
 ---
 

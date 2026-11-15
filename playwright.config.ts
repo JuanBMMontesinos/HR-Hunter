@@ -20,6 +20,10 @@ if (!unitOnly) {
     url: 'http://localhost:3000/api/v1/health',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
+    env: {
+      ...process.env,
+      RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS || '1000',
+    },
   });
 }
 if (!unitOnly && !apiOnly) {

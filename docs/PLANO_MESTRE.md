@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟢 F2 — Backend Core (Auth JWT, RBAC Granular, Segurança, Exports, Analytics & Retenção) Concluído (Próxima: F3)  
+**Status Atual:** 🟢 F3 — Backend CRUDs Core, Dashboard Analytics & Settings Concluído (Próxima: F4)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -93,13 +93,13 @@ As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabas
 - [x] Implementar Alertas de Segurança, Notificações, Exports CSV/PDF, Analytics (`SecurityReports`) e Retenção (`node-cron`)
 - [x] Cobrir com testes Playwright (`tests/unit/` + `tests/api/` = `27/27` aprovados com Component/E2E) + criar `docs/API.md` e `docs/SECURITY_AND_PERMISSIONS.md`
 
-### Fase F3 — Backend CRUDs & Dashboard Analytics ⏳ Próxima
-- [ ] Implementar CRUDs `companies`, `job-openings`, `candidates` (+ sub-recursos + CSV import), `processes` (Kanban, next-stage, reject, offer, timeline), `users`
-- [ ] Implementar Dashboard KPIs, Analytics e Processos Críticos usando funções/views do Supabase
-- [ ] Implementar Settings (Geral, Funis/Etapas, Email Templates, Audit/Login History, Snapshot lógico)
-- [ ] Cobrir 100% dos endpoints com testes Playwright integrados ao Supabase + atualizar `docs/API.md` e Swagger
+### Fase F3 — Backend CRUDs & Dashboard Analytics ✅ Concluída
+- [x] Implementar CRUDs `companies`, `job-openings`, `candidates` (+ sub-recursos + CSV import), `processes` (Kanban, next-stage, reject, offer, timeline), `users`
+- [x] Implementar Dashboard KPIs, Analytics e Processos Críticos usando funções/views do Supabase
+- [x] Implementar Settings (Geral, Funis/Etapas, Email Templates, Audit/Login History, Snapshot lógico)
+- [x] Cobrir 100% dos endpoints com testes Playwright integrados ao Supabase (`37/37` aprovados) + atualizar `docs/API.md` e Swagger (`68` paths / `95` operações)
 
-### Fase F4 — Frontend Base, Design System, Auth & RBAC
+### Fase F4 — Frontend Base, Design System, Auth & RBAC ⏳ Próxima
 - [ ] Implementar tokens de `design-system.json` (`variables.css`), componentes comuns (`PageHeader`, `FilterBar`, `DataTable`, `StatusBadge`, `Modal`, `Toast`, `RichTextEditor`)
 - [ ] Configurar i18n completo (`pt-BR.json`, `en-US.json`, `stageTranslation.ts`)
 - [ ] Implementar `AuthContext`, `PermissionsContext`, `RoleProtectedRoute` (aguardando ambos loadings), `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied`

@@ -26,6 +26,9 @@ function mapRows(rows) {
 
 function normalizeOptionalString(value) {
   if (value === undefined || value === null) return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString();
+  }
   const trimmed = String(value).trim();
   return trimmed.length === 0 ? null : trimmed;
 }

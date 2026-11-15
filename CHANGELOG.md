@@ -4,6 +4,24 @@ Todas as mudanças notáveis do projeto **HR Hunter** serão documentadas neste 
 
 ## [Unreleased]
 
+### Added — Fase F3 (Backend CRUDs Core, Dashboard Analytics & Settings)
+- **Módulos CRUD Completos (`backend/validators/`, `backend/services/`, `backend/controllers/`, `backend/routes/`):**
+  - **Empresas (`/api/v1/companies`):** paginação limitada (`<= 20`/pág), validação de CNPJ único (`409`), estatísticas de vagas/candidatos e soft delete com guarda contra vagas ativas (`409`).
+  - **Vagas (`/api/v1/job-openings`):** normalização de aliases `salaryMin`/`salaryMax`, lock de edição em vagas `Preenchida` (`409`), `/candidates`, `/analytics` e guarda de exclusão com processos ativos.
+  - **Candidatos (`/api/v1/candidates`):** criação transacional, `cpf` opcional (`NULL` múltiplo via índice único parcial), CRUD de sub-recursos (`/experience`, `/education`, `/skills`) e importação em lote CSV (`POST /import` via `multer` + `csvParser.js`).
+  - **Processos Seletivos (`/api/v1/processes`):** visão `/kanban`, `/next-stage` via `fn_move_to_next_stage`, `/reject` com envio opcional de template, `/offer` + `PATCH /offer/:offerId` (conclusão automática em `Contratado`) e `/timeline` cronológica.
+  - **Usuários (`/api/v1/users`):** CRUD administrativo, atualização restrita de autoperfil, `/activity` e `/reset-password`.
+- **Dashboard & Configurações (`/api/v1/dashboard/*`, `/api/v1/settings/*`):**
+  - Integração às funções `fn_get_dashboard_kpis`, `fn_get_dashboard_analytics`, `fn_get_candidates_by_stage`, `fn_get_critical_processes` e view `vw_recruitment_metrics`.
+  - Gestão de configurações com mascaramento `is_sensitive`, CRUD de etapas/funis, templates HTML sanitizados com proteção `is_system = true` (`403`), `/email-test`, `/audit-log`, `/login-history` e `/backup` (snapshot lógico JSON/SQL auditado).
+- **Utilitários & Documentação API:** criados `queryHelpers.js`, `csvParser.js`, `responseHelper.js`, aprimorado `renderTemplate` em `sanitizer.js`, e Swagger expandido para `68` paths / `95` operações.
+- **Testes Playwright (`37/37` aprovados):** adicionados `tests/unit/phase3-helpers.spec.ts` (4) e 6 suítes API (`companies`, `job-openings`, `candidates`, `processes`, `users`, `dashboard-and-settings`), elevando a suíte para `15` unit + `15` API + `1` E2E + `6` Component Tests (`0` falhas, `0` pulados).
+
+### Fixed — Fase F3
+- **`backend/utils/dbMapper.js` (`normalizeOptionalString`):** conversão segura de instâncias `Date` (geradas por `Joi.date().iso()`) para string ISO UTC antes da persistência em `TIMESTAMPTZ`.
+- **`backend/services/processService.js`:** execução de `getProcessById` após o `COMMIT` de `withTransaction` em `createProcess`; serialização de queries no mesmo `client` transacional (também corrigido em `settingsService.js` eliminando `DeprecationWarning` do `pg`); e cast explícito `$1::varchar` / `$1::text` no `UPDATE offers` evitando erro PostgreSQL `42P08`.
+- **`playwright.config.ts`:** ajuste de `RATE_LIMIT_MAX_REQUESTS` (`1000`) para execução paralela de múltiplos workers API sem falso positivo de rate-limit.
+
 ### Added — Fase F2 (Backend Core: Auth JWT, RBAC Granular, Segurança, Exports, Analytics & Retenção)
 - **Autenticação & Política de Senha (`authService.js`, `tokenUtils.js`, `passwordPolicy.js`, `authController.js`, `routes/auth.js`):**
   - Endpoints `/api/v1/auth/login`, `logout`, `refresh-token`, `forgot-password`, `reset-password`, `permissions` e `me`.
