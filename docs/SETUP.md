@@ -47,6 +47,23 @@ FRONTEND_URL=http://localhost:5173
 API_URL=http://localhost:3000
 VITE_API_BASE_URL=http://localhost:3000/api/v1
 
+# Autenticação, Segurança & Retenção (Fase 2)
+JWT_SECRET=replace_with_64_char_random_secret
+JWT_REFRESH_SECRET=replace_with_another_64_char_random_secret
+JWT_EXPIRES_IN=1h
+REFRESH_TOKEN_EXPIRES_IN=7d
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+LOGIN_RATE_LIMIT_MAX=5
+ENABLE_RETENTION_CRON=false
+
+# E-mail SMTP (opcional em desenvolvimento)
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_FROM=noreply@hrhunter.com
+
 PLAYWRIGHT_BASE_URL=http://localhost:5173
 PLAYWRIGHT_API_URL=http://localhost:3000/api/v1
 ```
@@ -83,10 +100,10 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
-Endpoints principais disponíveis na Fase 1:
+Endpoints principais disponíveis:
 - **Frontend:** `http://localhost:5173`
 - **Health Check (API + Supabase ping):** `http://localhost:3000/api/v1/health`
-- **Swagger / OpenAPI:** `http://localhost:3000/api/docs`
+- **Swagger / OpenAPI (27 rotas documentadas):** `http://localhost:3000/api/docs`
 
 ---
 

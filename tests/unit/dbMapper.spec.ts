@@ -15,6 +15,7 @@ test.describe('Backend Unit — dbMapper & ErrorCodes', () => {
   test('converts snake_case database columns to camelCase DTO keys', () => {
     expect(snakeToCamel('full_name')).toBe('fullName');
     expect(snakeToCamel('is_password_reset_required')).toBe('isPasswordResetRequired');
+    expect(snakeToCamel('last_24h')).toBe('last24h');
     expect(camelToSnake('companyId')).toBe('company_id');
   });
 

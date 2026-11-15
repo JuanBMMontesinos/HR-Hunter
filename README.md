@@ -2,12 +2,12 @@
 
 Plataforma web de gestão de recrutamento e seleção (ATS/CRM) construída com **React + Vite + TypeScript**, **Node.js + Express**, **Supabase (PostgreSQL)** e suíte unificada de testes com **Playwright**.
 
-> **Status Atual:** Fase `F1` concluída (Setup do Monorepo, Banco Supabase com 27 tabelas/3 views/17 triggers/8 funções e seed completo, fundação Express + React Design System/i18n e `14/14` testes Playwright aprovados). Próxima etapa: **Fase `F2`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
+> **Status Atual:** Fase `F2` concluída (Auth JWT + cookie HttpOnly, RBAC granular, bloqueio/rate-limit, alertas automáticos de segurança, notificações, exports CSV/PDF, analytics `SecurityReports`, retenção `node-cron` e `27/27` testes Playwright aprovados). Próxima etapa: **Fase `F3`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
 
 ## Stack Implementada
 
 - **Frontend:** React 18, Vite 6, TypeScript 5.7, CSS Layers + Custom Properties (`design-system.json`), `react-i18next` (`pt-BR` / `en-US`), Axios, Lucide React
-- **Backend:** Node.js, Express, `pg` (PostgreSQL), Helmet, CORS restritivo, `express-rate-limit`, Winston, Swagger/OpenAPI (`/api/docs`, `/api/docs.json`)
+- **Backend:** Node.js, Express, `pg` (PostgreSQL), `jsonwebtoken`, `bcrypt`, `joi`, `pdfkit`, `nodemailer`, `node-cron`, Helmet, CORS restritivo, `express-rate-limit`, Winston, Swagger/OpenAPI (`/api/docs`, `/api/docs.json`)
 - **Banco de Dados:** Supabase (PostgreSQL Manageado, `project_ref=fhhgtjzwmhgdiokqqebg`)
 - **Testes:** Playwright (`@playwright/test` para unit/API/E2E e `@playwright/experimental-ct-react` para testes unitários de componentes)
 
@@ -21,20 +21,25 @@ HR-Hunter/
 │       ├── git-commit-push/SKILL.md           # Fluxo seguro de commit/push para este repo
 │       └── playwright-unit-testing/SKILL.md   # Padrão unificado de testes Playwright
 ├── backend/
-│   ├── config/                                # env.js, database.js (pg pool), swagger.js
-│   ├── middleware/                            # corsMiddleware.js, errorHandler.js, rateLimiter.js
-│   ├── routes/                                # health.js, index.js (/api/v1)
-│   ├── utils/                                 # dbMapper.js, errorCodes.js, logger.js
+│   ├── config/                                # env.js, database.js (pg pool + tx), swagger.js
+│   ├── controllers/                           # auth, permissions, securityAlerts, notifications, exports, analytics, retention
+│   ├── middleware/                            # authenticate, authorize, audit, cors, errorHandler, rateLimiter, validation
+│   ├── routes/                                # health, auth, permissions, security-alerts, notifications, exports, analytics, retention
+│   ├── services/                              # Regras de negócio transacionais (Auth, RBAC, Alertas, Exports, Analytics, Retenção)
+│   ├── utils/                                 # dbMapper, errorCodes, logger, passwordPolicy, sanitizer, tokenUtils
+│   ├── validators/                            # Schemas Joi (authValidator.js, securityValidator.js)
 │   ├── app.js
 │   └── server.js
 ├── database/
 │   ├── migrations/                            # 001..007 SQL idempotentes aplicados no Supabase
 │   └── scripts/                               # db.js, migrate.js, seed.js, inspect.js
 ├── docs/
+│   ├── API.md                                 # Referência dos endpoints REST (`/api/v1`)
 │   ├── ARCHITECTURE.md                        # Arquitetura do sistema e padrões técnicos
 │   ├── DATABASE.md                            # Schema Supabase (27 tabelas, 3 views, 17 triggers, 8 funções)
 │   ├── DATA_MAPPING.md                        # Mapeamento snake_case <-> camelCase e normalizações
 │   ├── PLANO_MESTRE.md                        # Plano mestre v2.0 e roadmap F0–F6
+│   ├── SECURITY_AND_PERMISSIONS.md            # Auth, rate limit, RBAC granular, alertas e retenção
 │   ├── SETUP.md                               # Guia completo de instalação, env e execução
 │   └── TESTING.md                             # Guia e cobertura da suíte unificada Playwright
 ├── frontend/
@@ -94,6 +99,8 @@ npm test
 - [Plano Mestre de Arquitetura e Roadmap (v2.0)](docs/PLANO_MESTRE.md)
 - [Guia de Setup e Ambiente](docs/SETUP.md)
 - [Arquitetura do Sistema](docs/ARCHITECTURE.md)
+- [Documentação da API (`/api/v1`)](docs/API.md)
+- [Segurança, Autenticação & Permissões RBAC](docs/SECURITY_AND_PERMISSIONS.md)
 - [Banco de Dados (Supabase PostgreSQL)](docs/DATABASE.md)
 - [Mapeamento de Dados (`snake_case` ↔ `camelCase`)](docs/DATA_MAPPING.md)
 - [Guia de Testes Automatizados (Playwright)](docs/TESTING.md)

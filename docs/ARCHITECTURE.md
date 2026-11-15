@@ -1,6 +1,6 @@
 # Arquitetura do Sistema — HR Hunter (v2.0)
 
-**Versão:** 2.0 (Fase 1 — Fundação)  
+**Versão:** 2.0 (Fase 2 — Auth, RBAC Granular & Segurança)  
 **Última Atualização:** 2026-11-15  
 
 ---
@@ -19,19 +19,27 @@ HR-Hunter/
 │   │   ├── database.js          # Pool PostgreSQL (pg) + healthCheck + withTransaction
 │   │   ├── env.js               # Carregamento e defaults de variáveis de ambiente
 │   │   └── swagger.js           # Especificação OpenAPI 3.0 (/api/docs)
+│   ├── controllers/             # Auth, Permissions, SecurityAlerts, Notifications, Exports, Analytics, Retention
 │   ├── middleware/
+│   │   ├── auditMiddleware.js   # Registro assíncrono em audit_log + metadados IP/UA
+│   │   ├── authenticate.js      # Validação JWT + verificação de usuário ativo
+│   │   ├── authorize.js         # RBAC granular authorize(resource, action) e requireAdmin
 │   │   ├── corsMiddleware.js    # CORS restritivo via FRONTEND_URL
 │   │   ├── errorHandler.js      # Resposta padrão de erros com códigos customizados
-│   │   └── rateLimiter.js       # Limite geral API e loginLimiter (5 req/15min)
-│   ├── routes/
-│   │   ├── health.js            # GET /api/v1/health
-│   │   └── index.js             # Agregador /api/v1
+│   │   ├── rateLimiter.js       # Limite API geral, loginLimiter e exportLimiter (10/h)
+│   │   └── validationMiddleware.js # Validação Joi declarativa
+│   ├── routes/                  # health, auth, permissions, securityAlerts, notifications, exports, analytics, retention
+│   ├── services/                # Regras de negócio transacionais integradas ao Supabase
 │   ├── utils/
 │   │   ├── dbMapper.js          # Conversão snake_case <-> camelCase e normalizações
 │   │   ├── errorCodes.js        # Enum ErrorCodes e classe AppError
-│   │   └── logger.js            # Winston structured logger
+│   │   ├── logger.js            # Winston structured logger
+│   │   ├── passwordPolicy.js    # Validação de complexidade de senha
+│   │   ├── sanitizer.js         # Proteção XSS HTML e CSV formula injection
+│   │   └── tokenUtils.js        # JWT sign/verify, tokens opacos SHA-256 e cookie options
+│   ├── validators/              # Schemas Joi (authValidator.js, securityValidator.js)
 │   ├── app.js                   # App Express (exportável para testes/servidor)
-│   ├── server.js                # Bootstrap HTTP + graceful shutdown (SIGINT/SIGTERM)
+│   ├── server.js                # Bootstrap HTTP, cron scheduler e graceful shutdown
 │   └── package.json
 ├── database/
 │   ├── migrations/              # 001..007 SQL idempotentes para Supabase PostgreSQL
@@ -41,10 +49,12 @@ HR-Hunter/
 │       ├── seed.js              # Seed idempotente (zero tabelas de domínio vazias)
 │       └── inspect.js           # Auditoria de tabelas, views, triggers e funções
 ├── docs/
+│   ├── API.md
 │   ├── ARCHITECTURE.md
 │   ├── DATABASE.md
 │   ├── DATA_MAPPING.md
 │   ├── PLANO_MESTRE.md
+│   ├── SECURITY_AND_PERMISSIONS.md
 │   ├── SETUP.md
 │   └── TESTING.md
 ├── frontend/

@@ -1,5 +1,5 @@
 function snakeToCamel(key) {
-  return String(key).replace(/_([a-z])/g, (_, char) => char.toUpperCase());
+  return String(key).replace(/_([a-z0-9])/g, (_, char) => char.toUpperCase());
 }
 
 function camelToSnake(key) {

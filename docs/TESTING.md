@@ -12,8 +12,8 @@ O HR Hunter adota o **Playwright** como ferramenta única de testes automatizado
 | Projeto / Camada | Config | Diretório | Escopo Verificado |
 |---|---|---|---|
 | **Component Unit Tests** (`chromium`) | [`frontend/playwright-ct.config.ts`](../frontend/playwright-ct.config.ts) | `frontend/tests/ct/*.spec.tsx` | Isolamento de componentes React no Chromium real (renderização, props, eventos, classes do Design System, i18n, teclado, WCAG) |
-| **Unit** (`unit`) | [`playwright.config.ts`](../playwright.config.ts) | `tests/unit/*.spec.ts` | Funções puras de domínio e utilitários (`dbMapper.js`, `errorCodes.js`, normalizações) |
-| **API Integration** (`api`) | [`playwright.config.ts`](../playwright.config.ts) | `tests/api/*.spec.ts` | Endpoints Express (`/api/v1/health`, `/api/docs.json`) e invariantes reais do schema no Supabase PostgreSQL |
+| **Unit** (`unit`) | [`playwright.config.ts`](../playwright.config.ts) | `tests/unit/*.spec.ts` | Funções puras de domínio e utilitários (`dbMapper.js`, `errorCodes.js`, `passwordPolicy.js`, `tokenUtils.js`, `sanitizer.js`, `securityAlertService.js`, `securityAnalyticsService.js`, `auditService.js`) |
+| **API Integration** (`api`) | [`playwright.config.ts`](../playwright.config.ts) | `tests/api/*.spec.ts` | Endpoints Express (`/api/v1/health`, `/auth/*`, `/permissions/*`, `/security-alerts/*`, `/notifications/*`, `/exports/*`, `/analytics/*`, `/retention/*`, `/api/docs.json`) integrados ao Supabase PostgreSQL |
 | **E2E** (`e2e`) | [`playwright.config.ts`](../playwright.config.ts) | `tests/e2e/*.spec.ts` | Fluxo completo no browser Chromium integrando Frontend Vite + Backend Express + Supabase |
 
 ---
@@ -50,19 +50,23 @@ npm run build:frontend
 
 ---
 
-## 4. Cobertura Atual (Fase 1 — Verificada)
+## 4. Cobertura Atual (Fase 2 — Verificada)
 
 - **Component Unit Tests (`npm run test:ct`) — 6/6 aprovados:**
   - `frontend/tests/ct/Button.spec.tsx` (3 testes): variantes `solid`/`ghost`/`neutral`, click handler, estado `disabled`, foco por teclado e altura mínima WCAG `44px`.
   - `frontend/tests/ct/StatusBadge.spec.tsx` (1 teste): variantes semânticas `success`, `warning`, `danger` e `neutral`.
   - `frontend/tests/ct/LanguageSwitcher.spec.tsx` (1 teste): alternância `PT-BR` ↔ `EN-US`, persistência em `localStorage` (`hr_hunter_lang`) e atualização de `document.documentElement.lang`.
   - `frontend/tests/ct/PageHeader.spec.tsx` (1 teste): landmark `banner`, título, subtítulo, slot de ações e `LanguageSwitcher`.
-- **Root Suite (`npm test`) — 8/8 aprovados:**
-  - `tests/unit/dbMapper.spec.ts` (4 testes): conversão `snake_case` → `camelCase`, mapeamento de coleções, normalização de strings vazias opcionais (`cpf`) para `null` e construção de `AppError`.
-  - `tests/api/health-and-schema.spec.ts` (3 testes): saúde da API + latência do Supabase (`GET /api/v1/health`), especificação OpenAPI (`GET /api/docs.json`) e verificação no Supabase das 7 migrations (`001`–`007`), `users`, `permissions` (28), múltiplos candidatos com `cpf IS NULL`, `fn_get_dashboard_kpis()` e `fn_get_critical_processes()`.
+- **Root Suite (`npm test`) — 21/21 aprovados (`11` unit + `9` api + `1` e2e):**
+  - `tests/unit/dbMapper.spec.ts` (4 testes): conversão `snake_case` → `camelCase` (incluindo dígitos como `last_24h`), mapeamento de coleções, normalização de strings vazias opcionais (`cpf`) para `null` e construção de `AppError`.
+  - `tests/unit/auth.spec.ts` (3 testes): política de senha forte (`validatePasswordStrength`), assinatura/verificação JWT e hash SHA-256 determinístico (`tokenUtils`), proteção contra XSS e *CSV formula injection* (`sanitizer`).
+  - `tests/unit/permissions.spec.ts` (4 testes): cálculo de risco `0..100` e classificação (`computeRiskScore`, `classifyRiskLevel`), recomendações automáticas (`buildRecommendations`), gatilhos de alerta (`evaluateAlertThresholds`: ≥5 usuário `HIGH`, ≥10 IP `CRITICAL`) e redação recursiva de segredos em `audit_log` (`redactSensitiveValues`).
+  - `tests/api/health-and-schema.spec.ts` (3 testes): saúde da API + latência do Supabase (`GET /api/v1/health`), especificação OpenAPI (`GET /api/docs.json`) e verificação no Supabase das 7 migrations (`001`–`007`), 27 tabelas, 3 views, 8 funções, triggers e dados iniciais.
+  - `tests/api/auth.spec.ts` (3 testes): login JWT + cookie `HttpOnly`, `/auth/me`, `/auth/permissions`, rotação de refresh token com detecção de replay e revogação no logout, bloqueio por 5 senhas incorretas (`423`) + `loginLimiter` na 6ª tentativa (`429`), e fluxo `forgot-password` / `reset-password` com validação de política.
+  - `tests/api/permissions-and-security.spec.ts` (3 testes): gestão da matriz RBAC, proteção de `Admin` (`403`), invalidação de cache e registro `PERMISSION_CHANGE` em `audit_log`; escalação de ≥5 tentativas `403` para alerta `HIGH` + notificação a admins + resolução; exportações CSV (`UTF-8` com BOM + `;`) e PDF (`pdfkit`), geração de `SecurityReports` e execução de retenção de dados.
   - `tests/e2e/smoke.spec.ts` (1 teste): carregamento da UI em `http://localhost:5173`, badge vivo `Supabase Conectado` e troca dinâmica `PT-BR` ↔ `EN-US`.
 
-**Total consolidado na Fase 1:** `14/14` testes Playwright aprovados (`0` falhas, `0` pulados).
+**Total consolidado na Fase 2:** `27/27` testes Playwright aprovados (`0` falhas, `0` pulados).
 
 ---
 

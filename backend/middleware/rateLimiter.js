@@ -17,9 +17,13 @@ const apiLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: env.loginRateLimitMax,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    return `${req.ip}:${email || 'anonymous'}`;
+  },
   message: {
     success: false,
     error: {
@@ -29,7 +33,22 @@ const loginLimiter = rateLimit({
   },
 });
 
+const exportLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: env.exportRateLimitMax,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'RATE_LIMIT',
+      message: 'Limite de exportações por hora atingido. Tente novamente mais tarde.',
+    },
+  },
+});
+
 module.exports = {
   apiLimiter,
   loginLimiter,
+  exportLimiter,
 };

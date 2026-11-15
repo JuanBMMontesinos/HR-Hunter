@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟢 F1 — Setup do Monorepo, Banco Supabase, Fundação Backend/Frontend & Playwright Concluídos (Próxima: F2)  
+**Status Atual:** 🟢 F2 — Backend Core (Auth JWT, RBAC Granular, Segurança, Exports, Analytics & Retenção) Concluído (Próxima: F3)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -87,13 +87,13 @@ As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabas
 - [x] Criar `docs/DATABASE.md`, `docs/DATA_MAPPING.md`, `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/TESTING.md` e sincronizar `README.md` / `CHANGELOG.md`
 - [x] Commit e push da Fase 1 para `https://github.com/JuanBMMontesinos/HR-Hunter`
 
-### Fase F2 — Backend Core: Auth, RBAC Granular & Segurança ⏳ Próxima
-- [ ] Implementar Auth (`/auth/login`, `logout`, `refresh-token`, `forgot-password`, `reset-password`, `permissions`)
-- [ ] Implementar Permissões Granulares (`/permissions/matrix`, `roles/:role`, `audit-log`)
-- [ ] Implementar Alertas de Segurança, Notificações, Exports CSV/PDF, Analytics (`SecurityReports`) e Retenção (`node-cron`)
-- [ ] Cobrir com testes Playwright (`tests/unit/` e `tests/api/`) + atualizar `docs/API.md` e `docs/SECURITY_AND_PERMISSIONS.md`
+### Fase F2 — Backend Core: Auth, RBAC Granular & Segurança ✅ Concluída
+- [x] Implementar Auth (`/auth/login`, `logout`, `refresh-token`, `forgot-password`, `reset-password`, `permissions`, `me`)
+- [x] Implementar Permissões Granulares (`/permissions/matrix`, `roles/:role`, `audit-log`) com proteção de `Admin` e cache TTL 5 min
+- [x] Implementar Alertas de Segurança, Notificações, Exports CSV/PDF, Analytics (`SecurityReports`) e Retenção (`node-cron`)
+- [x] Cobrir com testes Playwright (`tests/unit/` + `tests/api/` = `27/27` aprovados com Component/E2E) + criar `docs/API.md` e `docs/SECURITY_AND_PERMISSIONS.md`
 
-### Fase F3 — Backend CRUDs & Dashboard Analytics
+### Fase F3 — Backend CRUDs & Dashboard Analytics ⏳ Próxima
 - [ ] Implementar CRUDs `companies`, `job-openings`, `candidates` (+ sub-recursos + CSV import), `processes` (Kanban, next-stage, reject, offer, timeline), `users`
 - [ ] Implementar Dashboard KPIs, Analytics e Processos Críticos usando funções/views do Supabase
 - [ ] Implementar Settings (Geral, Funis/Etapas, Email Templates, Audit/Login History, Snapshot lógico)
