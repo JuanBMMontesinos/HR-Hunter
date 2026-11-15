@@ -1,0 +1,140 @@
+name: HR Hunter CI/CD
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hr-hunter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-build-and-audit:
+    name: Lint, Build, SQL, Docs & Docker Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install all workspace dependencies
+        run: npm run install:all
+
+      - name: Run static security, JS syntax, SQL migration, docs and Swagger checks
+        run: |
+          npm run verify:security
+          npm run verify:syntax
+          npm run verify:sql
+          npm run verify:docs
+          npm run verify:swagger
+
+      - name: Frontend typecheck & production build
+        run: |
+          npm run typecheck:frontend
+          npm run build:frontend
+
+      - name: Validate Docker Compose & build production images
+        run: |
+          cp .env.example .env
+          docker compose config -q
+          docker build -t hr-hunter-backend:ci ./backend
+          docker build -t hr-hunter-frontend:ci --build-arg VITE_API_BASE_URL=/api/v1 ./frontend
+          rm -f .env
+
+  playwright-unit-and-ct:
+    name: Playwright Unit & Component Tests
+    runs-on: ubuntu-latest
+    needs: [lint-build-and-audit]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Install Playwright Chromium browser
+        run: |
+          npx playwright install chromium --with-deps
+          npx --prefix frontend playwright install chromium
+
+      - name: Run backend/domain Playwright unit tests
+        run: npm run test:unit
+
+      - name: Run frontend Playwright Component Tests
+        run: npm run test:ct
+
+      - name: Upload Playwright CT report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-ct-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  playwright-api-and-e2e:
+    name: Playwright API & E2E Tests (Supabase)
+    runs-on: ubuntu-latest
+    needs: [lint-build-and-audit, playwright-unit-and-ct]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Install Playwright Chromium for E2E
+        run: npx playwright install chromium --with-deps
+
+      - name: Run API & E2E suites against staging/test Supabase
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          DB_SSL: 'true'
+          COOKIE_SECURE: 'false'
+          FRONTEND_URL: http://localhost:5173
+          PLAYWRIGHT_BASE_URL: http://localhost:5173
+          PLAYWRIGHT_API_URL: http://localhost:3000/api/v1
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret not configured (e.g. external fork PR) — skipping live Supabase integration step."
+            exit 0
+          fi
+          npx playwright test --project=api --project=e2e
+
+      - name: Upload Playwright API/E2E report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 7

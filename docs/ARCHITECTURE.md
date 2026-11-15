@@ -1,6 +1,6 @@
 # Arquitetura do Sistema — HR Hunter (v2.0)
 
-**Versão:** 2.0 (Fase 5 — CRUDs, Kanban, Dashboard Analítico & Módulo Settings)  
+**Versão:** 2.0 (Fase 6 — Docker, CI/CD, Proxy Reverso & Produção)  
 **Última Atualização:** 2026-11-15  
 
 ---
@@ -14,6 +14,9 @@ HR-Hunter/
 │       ├── docs-sync/SKILL.md
 │       ├── git-commit-push/SKILL.md
 │       └── playwright-unit-testing/SKILL.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # Pipeline GitHub Actions (lint, build, Docker, Playwright)
 ├── backend/
 │   ├── config/
 │   │   ├── database.js          # Pool PostgreSQL (pg) + healthCheck + withTransaction
@@ -43,6 +46,8 @@ HR-Hunter/
 │   ├── validators/              # Schemas Joi (auth, security, company, jobOpening, candidate, process, user, dashboardAndSettings)
 │   ├── app.js                   # App Express (exportável para testes/servidor)
 │   ├── server.js                # Bootstrap HTTP, cron scheduler e graceful shutdown
+│   ├── Dockerfile               # Build multi-stage Node 24 Alpine (usuário non-root node)
+│   ├── .dockerignore
 │   └── package.json
 ├── database/
 │   ├── migrations/              # 001..007 SQL idempotentes para Supabase PostgreSQL
@@ -77,17 +82,25 @@ HR-Hunter/
 │   │   ├── types/               # auth.ts, common.ts, domain.ts
 │   │   ├── utils/               # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts, formatters.ts
 │   │   ├── App.tsx              # BrowserRouter + guards RBAC + ToastViewport
-│   │   └── main.tsx
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts        # Tipagem ImportMetaEnv (VITE_API_BASE_URL)
 │   ├── tests/ct/                # Testes unitários de componentes React (Playwright CT) + harnesses/
+│   ├── Dockerfile               # Build estático Vite + runtime nginx:1.27-alpine
+│   ├── .dockerignore
+│   ├── nginx.conf               # Proxy reverso /api/ -> backend:3000 + fallback SPA + cache
 │   ├── playwright-ct.config.ts
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   └── package.json
+├── scripts/
+│   └── verify.js                # Auditoria estática (sintaxe JS, SQL, segredos, docs e Swagger)
 ├── tests/
 │   ├── unit/                    # Testes unitários via Playwright
 │   ├── api/                     # Testes de integração API + Supabase via Playwright
 │   └── e2e/                     # Testes ponta a ponta no Chromium via Playwright
 ├── design-system.json           # Fonte única de tokens visuais e acessibilidade
+├── docker-compose.yml           # Orquestração frontend + backend (Supabase externo via .env)
+├── .dockerignore
 ├── playwright.config.ts
 ├── .env.example
 ├── .gitignore
@@ -157,3 +170,20 @@ HR-Hunter/
 
 4. **Configurações Administrativas (`SettingsPage` & `components/settings/*`):**
    - Arquitetura de 9 abas WAI-ARIA (`Tabs.tsx`) no modo `selectionMode="activation"`, evitando buscas HTTP até confirmação da aba ativa; detalhes completos em [SETTINGS_MODULE.md](./SETTINGS_MODULE.md).
+
+---
+
+## 6. Infraestrutura Docker, Proxy Reverso & CI/CD (Fase 6)
+
+1. **Containerização Multi-Stage (`backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.yml`):**
+   - **Backend:** baseado em `node:24-alpine` com `npm ci --omit=dev`, executado sob `USER node`, com `HEALTHCHECK` usando `fetch` nativo do Node 24 em `http://127.0.0.1:3000/api/v1/health`.
+   - **Frontend:** compila o bundle Vite no stage `builder` (`node:24-alpine`) injetando `VITE_API_BASE_URL` (padrão `/api/v1`) e serve os arquivos estáticos em `nginx:1.27-alpine`.
+   - **Orquestração:** [`docker-compose.yml`](../docker-compose.yml) conecta apenas `backend` e `frontend` na rede `hr-hunter-net` (`depends_on: condition: service_healthy`), sem banco local — apontando diretamente para o **Supabase** via `.env` (com suporte opcional a IPv4 Session Pooler).
+2. **Proxy Reverso & Estratégia de Cache (`frontend/nginx.conf`):**
+   - Requests `/api/` são encaminhados para `http://backend:3000` com cabeçalhos `X-Real-IP`, `X-Forwarded-For` e `X-Forwarded-Proto` e payload máximo de `10m`.
+   - `/assets/` recebe cache imutável (`max-age=31536000, immutable`), `/index.html` usa `no-cache, no-store, must-revalidate` e demais rotas caem em `try_files $uri $uri/ /index.html;`.
+3. **Observabilidade & Logging (`backend/utils/logger.js`):**
+   - Winston estruturado em JSON (`timestamp`, `errors({ stack: true })`, `json()`) em `NODE_ENV=production` para ingestão em stdout/containers, e console colorido legível em `development`.
+4. **Automação de Qualidade & Pipeline CI/CD (`scripts/verify.js`, `.github/workflows/ci.yml`):**
+   - `scripts/verify.js` automatiza cinco checagens: sintaxe JS (`node --check`), integridade/proibição de sintaxe MSSQL nas migrations `.sql`, varredura de segredos em arquivos rastreados no Git, validação de links relativos em todos os Markdowns (`docs/*.md`, `README.md`, `CHANGELOG.md`) e integridade da spec OpenAPI (`OpenAPI 3.0.3`, `68` paths, `95` operações).
+   - O workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) executa `lint-build-and-audit`, `playwright-unit-and-ct` e `playwright-api-and-e2e` com upload dos relatórios Playwright como artifacts.

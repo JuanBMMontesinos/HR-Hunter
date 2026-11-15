@@ -55,7 +55,7 @@ function getRefreshCookieOptions(maxAgeMs) {
   return {
     httpOnly: true,
     sameSite: 'lax',
-    secure: env.nodeEnv === 'production',
+    secure: env.cookieSecure,
     path: '/api/v1/auth',
     ...(maxAgeMs !== undefined ? { maxAge: maxAgeMs } : {}),
   };

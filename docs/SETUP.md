@@ -128,4 +128,46 @@ npm run test:ct
 # Typecheck e Build do Frontend
 npm run typecheck:frontend
 npm run build:frontend
+
+# Auditoria Estática Completa (Sintaxe JS, SQL, Segredos, Docs e OpenAPI Swagger)
+npm run verify:ci
+npm run lint
 ```
+
+---
+
+## 6. Execução em Containers Docker (`docker-compose.yml`)
+
+O HR Hunter utiliza **Supabase gerenciado** como banco externo — não há container de banco local nem MSSQL no [`docker-compose.yml`](../docker-compose.yml).
+
+### Imagens & Serviços
+- **`backend` (`backend/Dockerfile`):** build multi-stage em `node:24-alpine` com `npm ci --omit=dev`, execução sob usuário não-root `USER node`, porta `3000` e `HEALTHCHECK` nativo via `fetch('http://127.0.0.1:3000/api/v1/health')`.
+- **`frontend` (`frontend/Dockerfile` + `frontend/nginx.conf`):** build estático Vite em `node:24-alpine` (`VITE_API_BASE_URL=/api/v1`) servido por `nginx:1.27-alpine` na porta `${FRONTEND_PORT:-8080}:80`, proxy reverso `/api/` -> `http://backend:3000`, cache imutável em `/assets/`, `no-cache` em `/index.html`, fallback SPA e `HEALTHCHECK` via `wget`.
+
+### Subindo via Docker Compose
+
+1. Copie `.env.example` para `.env` e preencha `DATABASE_URL`, `JWT_SECRET` e `JWT_REFRESH_SECRET`.
+   - **Nota sobre IPv6/Docker:** em ambientes sem roteamento IPv6 de saída, configure `DATABASE_URL` usando a URI do **Supabase Session Pooler (IPv4)** em vez do host direto `db.<project_ref>.supabase.co`.
+   - **Nota sobre `COOKIE_SECURE`:** em produção atrás de HTTPS mantenha `COOKIE_SECURE=true` (padrão quando `NODE_ENV=production`); exclusivamente para testar o Docker Compose em `http://localhost:8080` sem TLS, defina `COOKIE_SECURE=false`.
+2. Execute:
+
+```bash
+docker compose up -d --build
+# ou build individual das imagens:
+docker build -t hr-hunter-backend:local ./backend
+docker build -t hr-hunter-frontend:local --build-arg VITE_API_BASE_URL=/api/v1 ./frontend
+```
+
+3. Endpoints em container:
+   - **Frontend SPA:** `http://localhost:8080`
+   - **API via Proxy Nginx:** `http://localhost:8080/api/v1/health`
+   - **API Direta / Swagger UI:** `http://localhost:3000/api/docs`
+
+---
+
+## 7. CI/CD com GitHub Actions ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml))
+
+O workflow dispara automaticamente em `push` e `pull_request` nas branches `main` e `dev` (ou manualmente via `workflow_dispatch`), estruturado em três jobs sequenciais:
+1. **`lint-build-and-audit`:** instala dependências, executa `verify:security`, `verify:syntax`, `verify:sql`, `verify:docs`, `verify:swagger`, `typecheck:frontend`, `build:frontend`, valida `docker compose config -q` e compila as imagens `hr-hunter-backend:ci` e `hr-hunter-frontend:ci`.
+2. **`playwright-unit-and-ct`:** instala o Chromium do Playwright e executa `npm run test:unit` + `npm run test:ct`, publicando o relatório como artifact.
+3. **`playwright-api-and-e2e`:** executa `npx playwright test --project=api --project=e2e` quando os secrets do repositório (`DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`) estão presentes (em PRs de forks sem secrets o passo é ignorado de forma segura sem quebrar a pipeline).

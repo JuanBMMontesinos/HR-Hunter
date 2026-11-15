@@ -46,11 +46,15 @@ npm run test:ct
 # Typecheck e build de produção do frontend
 npm run typecheck:frontend
 npm run build:frontend
+
+# Auditoria Estática & CI (Sintaxe JS, Migrations SQL, Segredos Git, Links Markdown & OpenAPI)
+npm run verify:ci
+npm run lint
 ```
 
 ---
 
-## 4. Cobertura Atual (Fase 5 — Verificada)
+## 4. Cobertura Atual (Fases 4–6 — Verificada)
 
 - **Component Unit Tests (`npm run test:ct`) — `22/22` aprovados (Fases 4 e 5):**
   - Inclui `Phase5Widgets.spec.tsx` (4 cenários: navegação por abas WAI-ARIA `Tabs`, KPIs/gráficos SVG acessíveis com alternância para tabela e `CriticalProcessesCard`, movimentação acessível entre colunas no `ProcessKanban` com anúncio via região viva e `ConfirmModal` + barra `<progress>` nativa) somado aos `18` cenários base de Fase 4.
@@ -62,7 +66,7 @@ npm run build:frontend
   - `frontend/tests/ct/PageHeader.spec.tsx` (1 teste): landmark `banner`, título, subtítulo, slot de ações e `LanguageSwitcher`.
 - **Root Suite (`npm test`) — `39/39` aprovados (`18` unit + `15` api + `6` e2e):**
   - `tests/unit/dbMapper.spec.ts` (4 testes): conversão `snake_case` → `camelCase` (incluindo dígitos como `last_24h`), mapeamento de coleções, normalização de strings vazias opcionais (`cpf`) e instâncias `Date` (ISO UTC ou `null`), e construção de `AppError`.
-  - `tests/unit/auth.spec.ts` (3 testes): política de senha forte (`validatePasswordStrength`), assinatura/verificação JWT e hash SHA-256 determinístico (`tokenUtils`), proteção contra XSS e *CSV formula injection* (`sanitizer`).
+  - `tests/unit/auth.spec.ts` (3 testes): política de senha forte (`validatePasswordStrength`), assinatura/verificação JWT, hash SHA-256 determinístico e opções de cookie `getRefreshCookieOptions(60_000)` (`httpOnly: true`, `sameSite: 'lax'`, `path: '/api/v1/auth'`, `secure` booleano) em `tokenUtils`, além de proteção contra XSS e *CSV formula injection* (`sanitizer`).
   - `tests/unit/permissions.spec.ts` (4 testes): cálculo de risco `0..100` e classificação (`computeRiskScore`, `classifyRiskLevel`), recomendações automáticas (`buildRecommendations`), gatilhos de alerta (`evaluateAlertThresholds`: ≥5 usuário `HIGH`, ≥10 IP `CRITICAL`) e redação recursiva de segredos em `audit_log` (`redactSensitiveValues`).
   - `tests/unit/phase3-helpers.spec.ts` (4 testes): parser CSV com BOM UTF-8, delimitador `;` e aspas (`parseCsvText`), paginação e construtores SQL (`queryHelpers`), renderização de templates com escape XSS (`renderTemplate`), e normalização de `salaryMin`/`salaryMax` (`createJobOpeningSchema`).
   - `tests/unit/stageTranslation.spec.ts` (3 testes): tradução das 9 etapas padrão PT-BR ↔ EN-US (`translateStageName`), normalização acentuada (`normalizeStageSlug`) preservando etapas customizadas, e avaliação client-side `evaluatePasswordStrength`.
@@ -80,7 +84,7 @@ npm run build:frontend
   - `tests/e2e/crud-and-kanban.spec.ts` (1 teste): jornada completa de recrutamento via UI contra Supabase (`Empresas` → `Vagas` com bloqueio em `Preenchida` → `Candidatos` com CPF opcional + importação CSV → `Processos` Kanban + avaliação 5 estrelas + `Offer` + contratação + histórico → `Users` + `Profile`).
   - `tests/e2e/dashboard-and-settings.spec.ts` (1 teste): verificação completa do `Dashboard` analítico (7 KPIs, 4 gráficos/tabelas, filtros globais) e operação das **9 abas** de `Settings` (etapas, dry-run de retenção, logs, relatório de risco com `<progress>`, trava `Admin` + alteração/restauração de permissões `Consultor` e snapshot lógico).
 
-**Total consolidado na Fase 5:** `61/61` testes Playwright aprovados (`22` Component Tests + `18` Backend Unit + `15` API Integration + `6` E2E; `0` falhas, `0` pulados).
+**Total consolidado (Fase 6 / Auditoria Final):** `61/61` testes Playwright aprovados (`22` Component Tests + `18` Backend Unit + `15` API Integration + `6` E2E; `0` falhas, `0` pulados, `0` registros `pw%` residuais no Supabase).
 
 ---
 
@@ -90,3 +94,11 @@ npm run build:frontend
 2. **Sem mocks falsos de banco nos testes `api` e `e2e`:** validações de integração executam roundtrips reais contra o Supabase PostgreSQL.
 3. **Sem `test.skip` ou afrouxamento de asserções:** todo teste adicionado ou alterado deve passar integralmente após a edição final antes do commit.
 4. **Higiene de dados (Fases F2+):** registros criados por testes de escrita deverão usar prefixos únicos e limpeza obrigatória em `test.afterEach` / `test.afterAll`.
+
+---
+
+## 6. Integração no Pipeline CI/CD ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml))
+
+1. **`lint-build-and-audit`:** executa `npm run verify:security`, `npm run verify:syntax`, `npm run verify:sql`, `npm run verify:docs`, `npm run verify:swagger`, `npm run typecheck:frontend`, `npm run build:frontend`, `docker compose config -q` e o build das duas imagens Docker (`backend` e `frontend`).
+2. **`playwright-unit-and-ct`:** executa `npm run test:unit` + `npm run test:ct` no Ubuntu com Chromium headless, publicando `frontend/playwright-report` como artifact.
+3. **`playwright-api-and-e2e`:** executa `npx playwright test --project=api --project=e2e` contra o Supabase quando os secrets `DATABASE_URL`, `JWT_SECRET` e `JWT_REFRESH_SECRET` estão configurados.

@@ -41,8 +41,10 @@ let authHandlers: AuthInterceptorHandlers = {
 
 let inFlightRefresh: Promise<string | null> | null = null;
 
+const resolvedBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || '/api/v1';
+
 export const apiClient = axios.create({
-  baseURL: '/api/v1',
+  baseURL: resolvedBaseUrl,
   timeout: 10000,
   withCredentials: true,
   headers: {

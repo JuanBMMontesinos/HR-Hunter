@@ -71,7 +71,7 @@ A conversão automática entre linhas do PostgreSQL (`snake_case`) e payloads JS
 
 ---
 
-## 5. Mapeamentos Adicionados na Fase 3 (Processos, Ofertas, Funis & Configurações)
+## 4. Mapeamentos Adicionados nas Fases 3–6 (Processos, Ofertas, Funis, Configurações & Segurança)
 
 ### Normalização de Datas Joi → PostgreSQL (`backend/utils/dbMapper.js`)
 O middleware `validationMiddleware.js` converte campos `Joi.date().iso()` (como `openedAt`, `startDate`, `endDate`, `scheduledAt`) para instâncias `Date` antes da camada de serviço. A função `normalizeOptionalString(value)` trata explicitamente `value instanceof Date`, convertendo datas válidas via `value.toISOString()` (e datas inválidas para `null`), evitando erros `22007` no PostgreSQL.
@@ -87,5 +87,6 @@ O middleware `validationMiddleware.js` converte campos `Joi.date().iso()` (como 
 - **E-mail Templates (`email_templates`):** `template_key` (`templateKey`), `subject`, `body_html` (`bodyHtml`), `variables`, `is_active` (`isActive`), `is_system` (`isSystem`)
 - **Configurações (`configurations`):** `config_key` (`configKey`), `config_value` (`configValue` — mascarada como `'********'` quando `is_sensitive = TRUE`), `description`, `category`, `is_sensitive` (`isSensitive`)
 
-### Aliases de Contrato na API
+### Aliases de Contrato na API & Payloads JSONB
 - **Vagas (`/api/v1/job-openings`):** `jobOpeningValidator.js` aceita `salaryMin`/`minSalary` e `salaryMax`/`maxSalary`, normalizando internamente para `minSalary`/`maxSalary` antes da persistência em `min_salary`/`max_salary`.
+- **Relatórios de Segurança (`security_reports`):** a coluna JSONB `report_data` é mapeada no DTO raiz para `reportData` via `dbMapper.js` (`mapRow`/`mapRows`), preservando as chaves analíticas geradas em `securityAnalyticsService.js` (`failedLogins`, `activeAlertsBySeverity`, `recommendations`, etc.).

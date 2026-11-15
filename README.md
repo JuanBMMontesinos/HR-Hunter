@@ -2,7 +2,7 @@
 
 Plataforma web de gestão de recrutamento e seleção (ATS/CRM) construída com **React + Vite + TypeScript**, **Node.js + Express**, **Supabase (PostgreSQL)** e suíte unificada de testes com **Playwright**.
 
-> **Status Atual:** Fase `F5` concluída (CRUDs completos de `Companies`, `JobOpenings`, `Candidates`, `Users` e `Profile`, Pipeline Kanban acessível de `Processes` com propostas/timeline, `Dashboard` analítico com 7 KPIs + 4 gráficos/tabelas acessíveis, módulo administrativo `Settings` com **9 abas** WAI-ARIA + documentação dedicada e `61/61` testes Playwright aprovados — `22` Component Tests + `39` Unit/API/E2E). Próxima etapa: **Fase `F6`** (Docker/CI/CD & Produção) conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
+> **Status Atual:** Fases `F0–F6` concluídas — **Pronto para Produção** (Docker multi-stage + Nginx reverse proxy, pipeline CI/CD GitHub Actions, `scripts/verify.js`, auditoria completa Swagger/SQL/Docs/Segredos e `61/61` testes Playwright aprovados — `22` Component Tests + `18` Unit + `15` API + `6` E2E — com `0` registros residuais no Supabase). Consulte [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
 
 ## Stack Implementada
 
@@ -20,6 +20,9 @@ HR-Hunter/
 │       ├── docs-sync/SKILL.md                 # Sincronização contínua de documentação
 │       ├── git-commit-push/SKILL.md           # Fluxo seguro de commit/push para este repo
 │       └── playwright-unit-testing/SKILL.md   # Padrão unificado de testes Playwright
+├── .github/
+│   └── workflows/
+│       └── ci.yml                             # CI/CD (verify, typecheck, Docker build, Playwright)
 ├── backend/
 │   ├── config/                                # env.js, database.js (pg pool + tx), swagger.js
 │   ├── controllers/                           # auth, permissions, securityAlerts, notifications, exports, analytics, retention, companies, jobOpening, candidate, process, user, dashboard, settings
@@ -29,7 +32,9 @@ HR-Hunter/
 │   ├── utils/                                 # csvParser, dbMapper, errorCodes, logger, passwordPolicy, queryHelpers, responseHelper, sanitizer, tokenUtils
 │   ├── validators/                            # Schemas Joi (auth, security, company, jobOpening, candidate, process, user, dashboardAndSettings)
 │   ├── app.js
-│   └── server.js
+│   ├── server.js
+│   ├── Dockerfile                             # Multi-stage Node 24 Alpine (USER node + healthcheck)
+│   └── .dockerignore
 ├── database/
 │   ├── migrations/                            # 001..007 SQL idempotentes aplicados no Supabase
 │   └── scripts/                               # db.js, migrate.js, seed.js, inspect.js
@@ -56,19 +61,27 @@ HR-Hunter/
 │   │   ├── types/                             # auth.ts, common.ts, domain.ts
 │   │   ├── utils/                             # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts, formatters.ts
 │   │   ├── App.tsx
-│   │   └── main.tsx
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts                      # Tipagem Vite Env (VITE_API_BASE_URL)
 │   ├── tests/ct/                              # Testes unitários de componentes React (Playwright CT) + harnesses/
+│   ├── Dockerfile                             # Build Vite + runtime nginx:1.27-alpine
+│   ├── .dockerignore
+│   ├── nginx.conf                             # Proxy reverso /api/ -> backend:3000 + fallback SPA
 │   ├── playwright-ct.config.ts
 │   ├── tsconfig.json
 │   └── vite.config.ts
+├── scripts/
+│   └── verify.js                              # Checagem estática (JS, SQL, segredos, docs, Swagger)
 ├── tests/
 │   ├── unit/                                  # Testes unitários via Playwright
 │   ├── api/                                   # Testes de integração API + Supabase via Playwright
 │   └── e2e/                                   # Testes E2E no browser Chromium via Playwright
+├── .dockerignore
 ├── .env.example                               # Modelo de variáveis de ambiente (sem segredos)
 ├── .gitignore                                 # Proteção de .env, artefatos e dependências
 ├── CHANGELOG.md                               # Registro cronológico de mudanças
 ├── design-system.json                         # Tokens visuais e contrato de componentes WCAG 2.1 AA
+├── docker-compose.yml                         # Orquestração Frontend + Backend conectada ao Supabase
 ├── package.json                               # Scripts unificados de workspace, DB, dev e testes
 ├── playwright.config.ts                       # Configuração Playwright (unit, api, e2e)
 └── README.md                                  # Este arquivo
@@ -93,11 +106,15 @@ npm run db:setup
 npm run dev:backend
 npm run dev:frontend
 
-# 6. Execute testes e validações de build
-npm run typecheck:frontend
+# 6. Execute testes e validações estáticas/build
+npm run verify:ci
+npm run lint
 npm run build:frontend
 npm run test:ct
 npm test
+
+# 7. Suba em containers Docker conectados ao Supabase (ajuste .env antes)
+docker compose up -d --build
 ```
 
 ## Documentação

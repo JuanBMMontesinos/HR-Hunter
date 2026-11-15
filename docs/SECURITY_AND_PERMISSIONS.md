@@ -1,7 +1,7 @@
 # Segurança, Autenticação & Permissões RBAC — HR Hunter (v2.0)
 
 **Última Atualização:** 2026-11-15  
-**Escopo:** Fases 2, 4 e 5 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics, Retenção & Interface Administrativa de Segurança  
+**Escopo:** Fases 2, 4, 5 e 6 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics, Retenção, Proxy Reverso Docker & Auditoria CI  
 
 ---
 
@@ -104,3 +104,19 @@ Quando `authorize(resource, action)` ou `requireAdmin` nega acesso (`403 FORBIDD
 - **Retenção e Reset Forçado de Senha (`SecurityAndRetentionTab.tsx` & `UsersPage.tsx`):**
   - Permite configurar políticas de retenção, consultar registros elegíveis, simular com `Dry-Run` ou executar expurgos auditados em `retention_execution_log`; administradores podem realizar reset de senha de outros usuários respeitando validação da política de força (`PasswordStrengthMeter.tsx`).
 - Documentação completa das 9 abas: [SETTINGS_MODULE.md](./SETTINGS_MODULE.md).
+
+---
+
+## 8. Hardening de Produção, Proxy Reverso & Auditoria Estática (Fase 6)
+
+- **`trust proxy` & Rastreabilidade Real (`backend/app.js`):**
+  - Configurado `app.set('trust proxy', 1)` para que `express-rate-limit` e `auditMiddleware.js` utilizem corretamente o IP original encaminhado pelo Nginx (`X-Forwarded-For` / `X-Real-IP`) em ambiente containerizado.
+- **Cookies `HttpOnly` & Diretiva CSP (`backend/config/env.js`, `backend/utils/tokenUtils.js`, `backend/app.js`):**
+  - `env.cookieSecure` assume `true` por padrão quando `NODE_ENV=production` e `false` em desenvolvimento, podendo ser sobrescrito explicitamente por `COOKIE_SECURE=true|false` (ex.: para teste local Docker Compose via HTTP sem TLS).
+  - `getRefreshCookieOptions(maxAgeMs)` emite cookies com `{ httpOnly: true, sameSite: 'lax', secure: env.cookieSecure, path: '/api/v1/auth' }`.
+  - Quando `env.cookieSecure` é `false`, o Helmet omite apenas `upgrade-insecure-requests` na CSP para evitar quebra de assets locais em HTTP puro, preservando todas as demais proteções em HTTPS.
+- **Cabeçalhos no Nginx & Container Não-Root (`frontend/nginx.conf`, `backend/Dockerfile`):**
+  - Nginx injeta `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN` e `Referrer-Policy: strict-origin-when-cross-origin`.
+  - A imagem do backend executa sob usuário não privilegiado (`USER node`) e sem `devDependencies` (`npm ci --omit=dev`).
+- **Prevenção de Vazamento de Segredos (`scripts/verify.js`):**
+  - `npm run verify:security` verifica a lista de arquivos rastreados pelo Git (`git ls-files`) bloqueando `.env*` (exceto `.env.example`), `.pem`/`.key`, blocos de chave privada, tokens JWT/Service Role literais e credenciais reais em URIs Supabase.

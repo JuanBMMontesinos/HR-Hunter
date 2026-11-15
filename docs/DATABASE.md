@@ -103,12 +103,17 @@ node database/scripts/inspect.js
 - **`vw_candidate_summary`**: resumo de candidatos com vagas aplicadas e etapas atuais agregadas.
 - **`vw_recruitment_metrics`**: métricas agregadas por empresa cliente.
 
-### Funções SQL (Substituindo Stored Procedures)
-- **`fn_get_dashboard_kpis(p_start_date, p_end_date, p_company_id, p_department)`**
-- **`fn_get_candidates_by_stage(p_job_opening_id, p_company_id)`**
-- **`fn_get_dashboard_analytics(p_start_date, p_end_date, p_company_id)`**
-- **`fn_get_critical_processes(p_company_id)`**
-- **`fn_move_to_next_stage(p_process_id, p_new_stage_id, p_feedback, p_rating, p_responsible_user_id, p_attached_documents)`**
+### Funções SQL (8 Rotinas PL/pgSQL)
+- **Consultas & Fluxos de Negócio:**
+  - **`fn_get_dashboard_kpis(p_start_date, p_end_date, p_company_id, p_department)`**
+  - **`fn_get_candidates_by_stage(p_job_opening_id, p_company_id)`**
+  - **`fn_get_dashboard_analytics(p_start_date, p_end_date, p_company_id)`**
+  - **`fn_get_critical_processes(p_company_id)`**
+  - **`fn_move_to_next_stage(p_process_id, p_new_stage_id, p_feedback, p_rating, p_responsible_user_id, p_attached_documents)`**
+- **Trigger Functions (`database/migrations/007_triggers_views_functions.sql`):**
+  - **`fn_set_updated_at()`** — atualiza `NEW.updated_at = NOW()` automaticamente nas 15 tabelas com triggers `trg_set_updated_at_*`.
+  - **`fn_prevent_delete_active_company()`** — impede `DELETE` em `companies` quando há vagas com status `Aberta` ou `Em Progresso` (`trg_prevent_delete_active_company`).
+  - **`fn_sync_process_stage()`** — sincroniza `current_stage_id` em `recruitment_processes` e conclui automaticamente processos em etapas terminais (`trg_sync_process_stage`).
 
 ---
 

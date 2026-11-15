@@ -45,6 +45,13 @@ test.describe('Backend Unit — Auth Policy, Tokens & Sanitizer', () => {
 
     expect(tokenUtils.parseDurationToMs('15m')).toBe(15 * 60 * 1000);
     expect(tokenUtils.parseDurationToMs('7d')).toBe(7 * 24 * 60 * 60 * 1000);
+
+    const cookieOpts = tokenUtils.getRefreshCookieOptions(60_000);
+    expect(cookieOpts.httpOnly).toBe(true);
+    expect(cookieOpts.sameSite).toBe('lax');
+    expect(cookieOpts.path).toBe('/api/v1/auth');
+    expect(cookieOpts.maxAge).toBe(60_000);
+    expect(typeof cookieOpts.secure).toBe('boolean');
   });
 
   test('sanitizer strips XSS vectors and shields CSV cells from formula injection', () => {

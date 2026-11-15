@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟢 F5 — Frontend CRUDs, Kanban, Dashboard & Settings Concluída (Próxima: F6)  
+**Status Atual:** 🟢 F6 — Docker, CI/CD & Auditoria Final Concluída (Pronto para Produção)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -112,10 +112,10 @@ As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabas
 - [x] Cobrir componentes com Playwright CT e fluxos completos com Playwright E2E
 
 ### Fase F6 — Docker, CI/CD, Auditoria Final & Produção
-- [ ] Criar Dockerfiles (`backend`, `frontend`) e `docker-compose.yml` (sem MSSQL)
-- [ ] Configurar GitHub Actions (`.github/workflows/ci.yml`) com lint, build, verificação de segredos e Playwright
-- [ ] Auditoria completa de `docs/*.md`, `README.md`, `CHANGELOG.md` e Swagger contra o código real
-- [ ] Execução integral de todas as suítes Playwright + validação final e push para `main`
+- [x] Criar Dockerfiles (`backend`, `frontend`) e `docker-compose.yml` (sem MSSQL)
+- [x] Configurar GitHub Actions (`.github/workflows/ci.yml`) com lint, build, verificação de segredos e Playwright
+- [x] Auditoria completa de `docs/*.md`, `README.md`, `CHANGELOG.md` e Swagger contra o código real
+- [x] Execução integral de todas as suítes Playwright + validação final e push para `main`
 
 ---
 

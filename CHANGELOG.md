@@ -4,6 +4,19 @@ Todas as mudanças notáveis do projeto **HR Hunter** serão documentadas neste 
 
 ## [Unreleased]
 
+### Added — Fase F6 (Docker, Proxy Reverso Nginx, CI/CD & Auditoria de Produção)
+- **Containerização & Proxy Reverso (`backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx.conf`, `docker-compose.yml`, `.dockerignore`):**
+  - Build multi-stage em `node:24-alpine` no backend (`npm ci --omit=dev`, usuário não-root `USER node`, healthcheck nativo Node `fetch`) e build Vite + `nginx:1.27-alpine` no frontend com proxy reverso `/api/` -> `http://backend:3000`, cache imutável em `/assets/`, `no-cache` em `/index.html`, cabeçalhos de segurança e fallback SPA.
+  - Orquestração sem banco local nem MSSQL via [`docker-compose.yml`](docker-compose.yml), conectada ao Supabase externo via `.env` (com suporte opcional a Supabase IPv4 Session Pooler).
+- **Hardening HTTP, Proxy & Config (`backend/app.js`, `backend/config/env.js`, `backend/utils/tokenUtils.js`, `frontend/src/services/api.ts`, `frontend/src/vite-env.d.ts`, `.env.example`):**
+  - Ativado `app.set('trust proxy', 1)` atrás do Nginx, adicionado controle explícito `COOKIE_SECURE` para cookies `hr_refresh_token` e ajuste condicional da diretiva CSP `upgrade-insecure-requests` apenas em HTTP local (`COOKIE_SECURE=false`), além de `VITE_API_BASE_URL=/api/v1` no cliente Axios.
+- **CI/CD & Script de Auditoria (`scripts/verify.js`, `.github/workflows/ci.yml`, `package.json`):**
+  - Pipeline GitHub Actions (`lint-build-and-audit`, `playwright-unit-and-ct`, `playwright-api-and-e2e`) com proteção para forks sem secrets, validação de `docker compose config -q`, build das imagens Docker e publicação de relatórios Playwright.
+  - Scripts `verify:syntax` (80 arquivos JS), `verify:sql` (7 migrations PostgreSQL sem dialeto MSSQL), `verify:security` (0 vazamentos em arquivos rastreados), `verify:docs` (11 Markdowns com 0 links relativos quebrados), `verify:swagger` (OpenAPI `3.0.3`, `68` paths, `95` operações) e `lint`.
+- **Sincronização Integral da Documentação & Validação Final:**
+  - Atualizados todos os documentos (`docs/API.md`, `docs/DATABASE.md` com as 8 rotinas PL/pgSQL, `docs/DATA_MAPPING.md`, `docs/SECURITY_AND_PERMISSIONS.md`, `docs/SETUP.md`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`, `docs/PLANO_MESTRE.md`, `README.md` e `CHANGELOG.md`).
+  - Validação integral aprovada: `docker build` de ambas as imagens (`backend` e `frontend`) com exit `0`, `npm run verify:ci`, `npm run lint`, `npm run build:frontend` e `61/61` testes Playwright aprovados (`22` Component Tests + `18` Unit + `15` API + `6` E2E; `0` falhas, `0` pulados, `0` registros residuais `pw%` no Supabase).
+
 ### Added — Fase F5 (Frontend CRUDs, Pipeline Kanban, Dashboard Analítico & Settings Admin)
 - **Contratos Tipados, Formatadores & Serviços (`frontend/src/types/domain.ts`, `utils/formatters.ts`, `services/*.ts`):**
   - DTOs e payloads completos cobrindo Empresas, Vagas, Candidatos (+ sub-recursos e CSV), Processos (Kanban, Propostas, Timeline), Usuários, Dashboard, Settings, Segurança/Alertas, Retenção LGPD, Matriz RBAC e Backup.

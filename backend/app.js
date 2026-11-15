@@ -6,12 +6,22 @@ const swaggerUi = require('swagger-ui-express');
 const corsMiddleware = require('./middleware/corsMiddleware');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorHandler');
+const env = require('./config/env');
 const swaggerSpec = require('./config/swagger');
 const apiRoutes = require('./routes');
 
 const app = express();
 
-app.use(helmet());
+app.set('trust proxy', 1);
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: env.cookieSecure ? {} : { 'upgrade-insecure-requests': null },
+    },
+  }),
+);
 app.use(corsMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

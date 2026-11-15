@@ -22,6 +22,10 @@ const env = {
   rateLimitMaxRequests: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 100),
   loginRateLimitMax: Number(process.env.LOGIN_RATE_LIMIT_MAX || 5),
   exportRateLimitMax: Number(process.env.EXPORT_RATE_LIMIT_MAX || 10),
+  cookieSecure:
+    process.env.COOKIE_SECURE !== undefined
+      ? process.env.COOKIE_SECURE === 'true'
+      : nodeEnv === 'production',
   smtpHost: process.env.SMTP_HOST || '',
   smtpPort: Number(process.env.SMTP_PORT || 587),
   smtpUser: process.env.SMTP_USER || '',

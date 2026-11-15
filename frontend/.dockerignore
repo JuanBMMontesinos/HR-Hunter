@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+node_modules
+dist
+playwright
+playwright/.cache
+test-results
+playwright-report
+tests
+*.log
