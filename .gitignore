@@ -1,0 +1,41 @@
+# Environment & Secrets (NEVER commit real credentials)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Build & Dist
+dist/
+build/
+frontend/dist/
+backend/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing & Coverage (Playwright / Coverage)
+coverage/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Uploads / Temp
+uploads/
+backend/uploads/
+tmp/
+*.tmp
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

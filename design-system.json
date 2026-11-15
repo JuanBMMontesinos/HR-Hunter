@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "meta": {
+    "version": "1.0.0",
+    "updated": "2025-12-08",
+    "sourceOfTruth": true,
+    "owner": "Design Systems Team",
+    "$comment": "This file centralizes the visual+interaction contract for both human and AI consumers."
+  },
+  "styleGuide": {
+    "colors": {
+      "$comment": "Semantic palette drives elevated minimalism aesthetic.",
+      "primary": {"value": "#F7941E", "usage": ["cta", "positiveFocus"], "contrast": "4.2:1"},
+      "primaryDark": {"value": "#D6780F", "usage": ["cta-hover", "tabs-active"], "contrast": "5.1:1"},
+      "secondary": {"value": "#3C7EFF", "usage": ["focus-outline", "info"], "contrast": "6.8:1"},
+      "accent": {"value": "#FFC66B", "usage": ["badges", "sparklines"], "contrast": "2.9:1"},
+      "surface": {"value": "#FDFDFD", "usage": ["card-bg"], "contrast": "--"},
+      "surfaceMuted": {"value": "#F5F5F5", "usage": ["panels", "inputs"], "contrast": "--"},
+      "canvas": {"value": "#F5F6F8", "usage": ["app-bg"], "contrast": "--"},
+      "border": {"value": "#E2E2E2", "usage": ["dividers", "input-strokes"], "contrast": "--"},
+      "textPrimary": {"value": "#2A2A2A", "usage": ["body", "labels"], "contrast": "13.1:1"},
+      "textSecondary": {"value": "#6E6E6E", "usage": ["meta", "placeholders"], "contrast": "5.5:1"},
+      "success": {"value": "#3CB371", "usage": ["pill-success", "sparkline"], "contrast": "5.2:1"},
+      "warning": {"value": "#FFB347", "usage": ["alerts", "pending"], "contrast": "3.1:1"},
+      "danger": {"value": "#D64545", "usage": ["errors", "destructive"], "contrast": "4.8:1"}
+    },
+    "typography": {
+      "fontFamilyPrimary": "\"Poppins\", \"Helvetica Neue\", Arial, sans-serif",
+      "scale": {
+        "display": {"size": 32, "lineHeight": 40, "weight": 600, "letterSpacing": -0.5},
+        "heading": {"size": 20, "lineHeight": 28, "weight": 600, "letterSpacing": -0.25},
+        "title": {"size": 18, "lineHeight": 26, "weight": 500},
+        "body": {"size": 14, "lineHeight": 20, "weight": 400},
+        "caption": {"size": 12, "lineHeight": 16, "weight": 400},
+        "label": {"size": 11, "lineHeight": 14, "weight": 600, "transform": "uppercase"}
+      },
+      "fallback": "system-ui"
+    },
+    "spacingLayout": {
+      "unit": 4,
+      "scale": {"xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "xxl": 32, "xxxl": 48},
+      "grid": {
+        "columns": 12,
+        "gutter": 24,
+        "maxWidth": 1280,
+        "margin": 48,
+        "alignment": "center"
+      },
+      "breakpoints": [
+        {"id": "xs", "min": 0, "max": 479, "columns": 4, "gutter": 12},
+        {"id": "sm", "min": 480, "max": 767, "columns": 6, "gutter": 16},
+        {"id": "md", "min": 768, "max": 1023, "columns": 8, "gutter": 20},
+        {"id": "lg", "min": 1024, "max": 1439, "columns": 12, "gutter": 24},
+        {"id": "xl", "min": 1440, "columns": 12, "gutter": 32}
+      ]
+    },
+    "radiiBordersShadows": {
+      "radius": {"none": 0, "sm": 8, "md": 16, "lg": 24, "pill": 999},
+      "border": {
+        "default": {"width": 1, "color": "#E2E2E2"},
+        "emphasis": {"width": 2, "color": "#F7941E"}
+      },
+      "shadow": {
+        "layer1": "0 6px 12px rgba(0,0,0,0.08)",
+        "layer2": "0 12px 28px rgba(0,0,0,0.12)",
+        "innerRaised": "inset 2px 2px 6px rgba(0,0,0,0.05), inset -2px -2px 6px rgba(255,255,255,0.8)"
+      }
+    },
+    "motion": {
+      "durations": {"fast": 120, "base": 200, "cardEntrance": 280, "highlightPulse": 900},
+      "easing": {
+        "default": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "emphasized": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "decelerate": "cubic-bezier(0, 0, 0.2, 1)",
+        "accelerate": "cubic-bezier(0.4, 0, 1, 1)"
+      },
+      "rules": [
+        "Hover scale never exceeds 1.02",
+        "Respect prefers-reduced-motion by removing translation"
+      ]
+    }
+  },
+  "components": {
+    "atomic": [
+      {
+        "id": "atom.button",
+        "name": "Primary Button",
+        "structure": ["container", "label", "optionalIcon"],
+        "variants": [
+          {"id": "solid", "background": "primary", "textColor": "surface"},
+          {"id": "ghost", "border": "emphasis", "textColor": "primary"},
+          {"id": "neutral", "background": "surfaceMuted", "textColor": "textPrimary"}
+        ],
+        "states": {
+          "default": {"shadow": "layer1"},
+          "hover": {"background": "primaryDark", "shadow": "layer2"},
+          "active": {"scale": 0.98, "shadow": "none"},
+          "disabled": {"opacity": 0.4, "cursor": "not-allowed"}
+        },
+        "responsive": {
+          "xs": {"width": "100%", "icon": "top"},
+          "md+": {"width": "auto", "icon": "left"}
+        },
+        "accessibility": {"minTouch": 44, "focusOutline": "secondary", "ariaRole": "button", "wcag": "2.1 AA"},
+        "exampleImplementation": {
+          "type": "tsx",
+          "snippet": "<Button variant=\"solid\" icon=\"upload\">Upload Report</Button>"
+        }
+      },
+      {
+        "id": "atom.input",
+        "name": "Text Input",
+        "structure": ["label", "inputField", "assistiveText"],
+        "variants": [
+          {"id": "default", "border": "default"},
+          {"id": "withIcon", "iconSlot": "leading"},
+          {"id": "inline", "background": "surface", "border": "none"}
+        ],
+        "states": {
+          "default": {"shadow": "none"},
+          "focus": {"borderColor": "secondary", "shadow": "0 0 0 4px rgba(60,126,255,0.2)"},
+          "error": {"borderColor": "danger", "assistiveColor": "danger"},
+          "disabled": {"background": "surfaceMuted", "textColor": "textSecondary"}
+        },
+        "responsive": {
+          "xs": {"width": "100%"},
+          "lg": {"width": "auto"}
+        },
+        "accessibility": {"label": "visible", "ariaDescribedby": true, "errorAnnouncement": true},
+        "exampleImplementation": {
+          "type": "json",
+          "snippet": {"component": "InputField", "props": {"label": "Email", "placeholder": "name@domain.com", "state": "focus"}}
+        }
+      },
+      {
+        "id": "atom.icon",
+        "name": "Line Icon",
+        "structure": ["24px canvas", "2px stroke"],
+        "variants": [{"id": "sm", "size": 16}, {"id": "md", "size": 20}, {"id": "lg", "size": 24}],
+        "states": {
+          "default": {"color": "textSecondary"},
+          "active": {"color": "primary"},
+          "muted": {"color": "border"}
+        },
+        "responsive": {"auto": "Scale with button heights"},
+        "accessibility": {"decorative": {"ariaHidden": true}, "informative": {"ariaLabel": "string"}}
+      }
+    ],
+    "composite": [
+      {
+        "id": "comp.card",
+        "name": "Data Card",
+        "structure": ["header", "metricRow", "trendArea", "footerActions"],
+        "variants": [
+          {"id": "stat", "content": ["label", "value", "delta"]},
+          {"id": "list", "content": ["title", "items"]},
+          {"id": "profile", "content": ["avatar", "statusPill"]}
+        ],
+        "states": {
+          "default": {"shadow": "layer1"},
+          "hover": {"shadow": "layer2", "translateY": -4},
+          "selected": {"border": "emphasis"}
+        },
+        "responsive": {
+          "lg": {"columnSpan": 4},
+          "md": {"columnSpan": 6},
+          "sm": {"columnSpan": 12, "stack": true}
+        },
+        "accessibility": {"role": "group", "headingLevel": 3, "colorContrast": ">=4.5"},
+        "exampleImplementation": {
+          "type": "tsx",
+          "snippet": "<StatsCard title=\"Watch Time\" value=\"128 hrs\" delta={{value: '+12%', trend: 'up'}} />"
+        }
+      },
+      {
+        "id": "comp.modal",
+        "name": "Session Modal",
+        "structure": ["iconBadge", "title", "body", "actionRow"],
+        "variants": [{"id": "warning"}, {"id": "info"}],
+        "states": {
+          "default": {"overlayOpacity": 0.6},
+          "busy": {"disableInputs": true}
+        },
+        "responsive": {
+          "lg": {"width": 480},
+          "sm": {"width": "100%", "height": "auto", "buttons": "stacked"}
+        },
+        "accessibility": {"role": "alertdialog", "ariaModal": true, "focusTrap": true, "announceChanges": true},
+        "exampleImplementation": {
+          "type": "tsx",
+          "snippet": "<SessionModal status=\"warning\" primaryLabel=\"Resolve\" secondaryLabel=\"Stay Logged In\" />"
+        }
+      },
+      {
+        "id": "comp.navigation.sidebar",
+        "name": "Account Sidebar",
+        "structure": ["avatarBlock", "subscriptionCTA", "navList", "logout"],
+        "variants": [{"id": "default", "width": 280}, {"id": "compact", "width": 72, "content": "icons"}],
+        "states": {
+          "default": {"shadow": "innerRaised"},
+          "hover": {"navItem": {"background": "surfaceMuted"}},
+          "selected": {"navItem": {"borderLeft": {"width": 3, "color": "primary"}}}
+        },
+        "responsive": {
+          "lg": {"position": "fixedLeft"},
+          "md": {"position": "topSheet"},
+          "sm": {"pattern": "iconDrawer", "trigger": "hamburger"}
+        },
+        "accessibility": {"landmark": "nav", "ariaCurrent": "page", "focusLoop": false},
+        "exampleImplementation": {
+          "type": "tsx",
+          "snippet": "<Sidebar user={currentUser} items={navItems} collapsed={isMobile} />"
+        }
+      }
+    ],
+    "layout": [
+      {
+        "id": "layout.grid",
+        "name": "Dashboard Grid",
+        "structure": ["header", "sidebar", "contentGrid"],
+        "variants": [{"id": "12col"}, {"id": "stacked"}],
+        "states": {"default": {}, "reducedMotion": {"disable": ["cardEntrance"]}},
+        "responsive": {
+          "lg": {"template": "sidebar 280px + content 1fr"},
+          "md": {"template": "header + content", "sidebar": "top"},
+          "sm": {"template": "single column", "sidebar": "drawer"}
+        },
+        "accessibility": {"skipLink": true, "tabOrder": "header -> sidebar -> main"}
+      },
+      {
+        "id": "layout.container",
+        "name": "Neumorphic Container",
+        "structure": ["surface", "innerShadow", "content"],
+        "variants": [{"id": "card"}, {"id": "panel"}],
+        "states": {"default": {"shadow": "layer1"}, "highlight": {"shadow": "layer2", "border": "emphasis"}},
+        "responsive": {"padding": {"xs": 16, "md": 24, "lg": 32}},
+        "accessibility": {"contrast": ">= 4.5", "prefersReducedMotion": "disable highlight pulse"}
+      }
+    ]
+  },
+  "principles": {
+    "philosophy": [
+      "Elevated minimalism with warm tactility",
+      "Data-first storytelling: clarity over decoration",
+      "Warm orange accents signal action and progress"
+    ],
+    "composition": {
+      "spacing": "Maintain base 4px rhythm; negative space increases with hierarchy",
+      "alignment": "Use 12-column grid; align icons on 24px columns",
+      "typographic": "One display style per view; never mix heading weights"
+    },
+    "interaction": {
+      "surfaces": "Cards hover with 200ms ease-out scale",
+      "tabs": "Underline animates over 120ms horizontal slide",
+      "toggles": "Language pills fade between states in 150ms"
+    },
+    "accessibility": {
+      "contrast": {"body": 6.5, "primaryOnWhite": 4.2},
+      "touchTargets": 44,
+      "focusStates": {"outline": "2px solid #3C7EFF", "offset": 2},
+      "wcag": "2.1 AA",
+      "screenReader": {
+        "sidebar": "Use nav landmark",
+        "calendar": "Announce month when changed",
+        "charts": "Provide data table fallback"
+      }
+    }
+  },
+  "aiGuidance": {
+    "naming": {
+      "pattern": "[category].[component].[variant]",
+      "examples": ["atom.button.solid", "comp.card.profile", "layout.grid.12col"]
+    },
+    "extensionRules": [
+      "Only add colors when semantic need cannot be met via existing tokens",
+      "New components must declare structure, states, responsive, accessibility",
+      "Derive spacing from defined scale; avoid arbitrary pixel values"
+    ],
+    "patternLibraryUsage": {
+      "reference": "Use components array as source; fallback to styleGuide tokens",
+      "validation": "Ensure new patterns pass contrast and motion rules"
+    },
+    "dosDonts": {
+      "dos": [
+        "Map UI copy to typography scale",
+        "Respect motion preferences",
+        "Document responsive breakpoints with min/max"
+      ],
+      "donts": [
+        "Do not invent icon styles beyond flat line icons",
+        "Avoid purple-on-white default themes",
+        "Never bypass accessibility requirements for speed"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "id": "calendarRange",
+      "description": "Dual month calendar with range selection",
+      "structure": ["header", "weekdayRow", "dateGrid"],
+      "usage": {
+        "desktop": "Render dual layout with 16px gap",
+        "mobile": "Switch to carousel single month",
+        "accessibility": "aria-live polite when month changes"
+      }
+    },
+    {
+      "id": "languageSwitcher",
+      "description": "Vertical pill toggle for locales",
+      "example": {
+        "component": "LanguageSwitcher",
+        "props": {"layout": "stacked", "active": "EN", "options": ["EN", "ES", "FR"]},
+        "states": ["default", "hover", "active"],
+        "responsive": {"xs": "convert to dropdown"}
+      }
+    }
+  ]
+}
