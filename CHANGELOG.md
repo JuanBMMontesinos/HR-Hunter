@@ -7,7 +7,7 @@ Todas as mudanças notáveis do projeto **HR Hunter** serão documentadas neste 
 ### Added — Fase F6 (Docker, Proxy Reverso Nginx, CI/CD & Auditoria de Produção)
 - **Containerização & Proxy Reverso (`backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx.conf`, `docker-compose.yml`, `.dockerignore`):**
   - Build multi-stage em `node:24-alpine` no backend (`npm ci --omit=dev`, usuário não-root `USER node`, healthcheck nativo Node `fetch`) e build Vite + `nginx:1.27-alpine` no frontend com proxy reverso `/api/` -> `http://backend:3000`, cache imutável em `/assets/`, `no-cache` em `/index.html`, cabeçalhos de segurança e fallback SPA.
-  - Orquestração sem banco local nem MSSQL via [`docker-compose.yml`](docker-compose.yml), conectada ao Supabase externo via `.env` (com suporte opcional a Supabase IPv4 Session Pooler).
+  - Orquestração sem banco local nem MSSQL via [`docker-compose.yml`](docker-compose.yml), rede `hr-hunter-net` com `enable_ipv6: true`, porta padrão `FRONTEND_PORT=8081` (evitando conflito com `8080`) e conexão direta ao Supabase externo via `.env` (IPv6 nativo ou Supabase IPv4 Session Pooler).
 - **Hardening HTTP, Proxy & Config (`backend/app.js`, `backend/config/env.js`, `backend/utils/tokenUtils.js`, `frontend/src/services/api.ts`, `frontend/src/vite-env.d.ts`, `.env.example`):**
   - Ativado `app.set('trust proxy', 1)` atrás do Nginx, adicionado controle explícito `COOKIE_SECURE` para cookies `hr_refresh_token` e ajuste condicional da diretiva CSP `upgrade-insecure-requests` apenas em HTTP local (`COOKIE_SECURE=false`), além de `VITE_API_BASE_URL=/api/v1` no cliente Axios.
 - **CI/CD & Script de Auditoria (`scripts/verify.js`, `.github/workflows/ci.yml`, `package.json`):**

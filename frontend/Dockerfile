@@ -3,7 +3,7 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci && npm cache clean --force
 
 COPY index.html tsconfig.json vite.config.ts ./
 COPY src ./src

@@ -11,18 +11,17 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY package*.json ./
-COPY app.js server.js ./
-COPY config ./config
-COPY controllers ./controllers
-COPY middleware ./middleware
-COPY routes ./routes
-COPY services ./services
-COPY utils ./utils
-COPY validators ./validators
+COPY --chown=node:node --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node app.js server.js ./
+COPY --chown=node:node config ./config
+COPY --chown=node:node controllers ./controllers
+COPY --chown=node:node middleware ./middleware
+COPY --chown=node:node routes ./routes
+COPY --chown=node:node services ./services
+COPY --chown=node:node utils ./utils
+COPY --chown=node:node validators ./validators
 
-RUN chown -R node:node /app
 USER node
 
 EXPOSE 3000

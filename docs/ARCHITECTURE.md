@@ -178,7 +178,7 @@ HR-Hunter/
 1. **Containerização Multi-Stage (`backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.yml`):**
    - **Backend:** baseado em `node:24-alpine` com `npm ci --omit=dev`, executado sob `USER node`, com `HEALTHCHECK` usando `fetch` nativo do Node 24 em `http://127.0.0.1:3000/api/v1/health`.
    - **Frontend:** compila o bundle Vite no stage `builder` (`node:24-alpine`) injetando `VITE_API_BASE_URL` (padrão `/api/v1`) e serve os arquivos estáticos em `nginx:1.27-alpine`.
-   - **Orquestração:** [`docker-compose.yml`](../docker-compose.yml) conecta apenas `backend` e `frontend` na rede `hr-hunter-net` (`depends_on: condition: service_healthy`), sem banco local — apontando diretamente para o **Supabase** via `.env` (com suporte opcional a IPv4 Session Pooler).
+   - **Orquestração:** [`docker-compose.yml`](../docker-compose.yml) conecta apenas `backend` e `frontend` na rede `hr-hunter-net` (`enable_ipv6: true`, `depends_on: condition: service_healthy`), mapeando `FRONTEND_PORT` (padrão `8081`) sem banco local — apontando diretamente para o **Supabase** via `.env` (com suporte a IPv6 nativo ou IPv4 Session Pooler).
 2. **Proxy Reverso & Estratégia de Cache (`frontend/nginx.conf`):**
    - Requests `/api/` são encaminhados para `http://backend:3000` com cabeçalhos `X-Real-IP`, `X-Forwarded-For` e `X-Forwarded-Proto` e payload máximo de `10m`.
    - `/assets/` recebe cache imutável (`max-age=31536000, immutable`), `/index.html` usa `no-cache, no-store, must-revalidate` e demais rotas caem em `try_files $uri $uri/ /index.html;`.

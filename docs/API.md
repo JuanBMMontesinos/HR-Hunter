@@ -215,6 +215,6 @@
 
 ## 14. Produção, Proxy Reverso Nginx & OpenAPI (Fase 6)
 - **Especificação OpenAPI (`GET /api/docs` e `GET /api/docs.json`):** gerada dinamicamente por `backend/config/swagger.js` em formato `OpenAPI 3.0.3` (`68` paths / `95` operações), validada automaticamente por `npm run verify:swagger`.
-- **Proxy Reverso (`frontend/nginx.conf`):** em produção Docker Compose, o container `frontend` (porta `8080` mapeada para `80`) encaminha `/api/*` para `http://backend:3000`, preservando `Host`, `X-Real-IP`, `X-Forwarded-For` e `X-Forwarded-Proto`, com `client_max_body_size 10m`.
+- **Proxy Reverso (`frontend/nginx.conf`):** em produção Docker Compose, o container `frontend` (porta padrão `8081` mapeada para `80`) encaminha `/api/*` para `http://backend:3000`, preservando `Host`, `X-Real-IP`, `X-Forwarded-For` e `X-Forwarded-Proto`, com `client_max_body_size 10m`.
 - **Trust Proxy & Cookies (`backend/app.js` / `backend/config/env.js`):** o Express utiliza `app.set('trust proxy', 1)` para manter precisão de IP no `rateLimiter` e `auditMiddleware` atrás do Nginx; o flag `Secure` do cookie `hr_refresh_token` (`httpOnly: true`, `sameSite: 'lax'`, path `/api/v1/auth`) é controlado por `COOKIE_SECURE` (`true` por padrão em `NODE_ENV=production`, podendo ser `false` apenas em teste HTTP local).
 - **Frontends & CI/CD Integrados:** módulos Core (Fase 4), Kanban/Dashboard/Settings (Fase 5) e pipeline Docker + GitHub Actions (Fase 6) implementados e documentados em [ARCHITECTURE.md](./ARCHITECTURE.md) e [SETUP.md](./SETUP.md).

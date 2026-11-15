@@ -142,13 +142,13 @@ O HR Hunter utiliza **Supabase gerenciado** como banco externo — não há cont
 
 ### Imagens & Serviços
 - **`backend` (`backend/Dockerfile`):** build multi-stage em `node:24-alpine` com `npm ci --omit=dev`, execução sob usuário não-root `USER node`, porta `3000` e `HEALTHCHECK` nativo via `fetch('http://127.0.0.1:3000/api/v1/health')`.
-- **`frontend` (`frontend/Dockerfile` + `frontend/nginx.conf`):** build estático Vite em `node:24-alpine` (`VITE_API_BASE_URL=/api/v1`) servido por `nginx:1.27-alpine` na porta `${FRONTEND_PORT:-8080}:80`, proxy reverso `/api/` -> `http://backend:3000`, cache imutável em `/assets/`, `no-cache` em `/index.html`, fallback SPA e `HEALTHCHECK` via `wget`.
+- **`frontend` (`frontend/Dockerfile` + `frontend/nginx.conf`):** build estático Vite em `node:24-alpine` (`VITE_API_BASE_URL=/api/v1`) servido por `nginx:1.27-alpine` na porta `${FRONTEND_PORT:-8081}:80`, proxy reverso `/api/` -> `http://backend:3000`, cache imutável em `/assets/`, `no-cache` em `/index.html`, fallback SPA e `HEALTHCHECK` via `wget`.
 
 ### Subindo via Docker Compose
 
 1. Copie `.env.example` para `.env` e preencha `DATABASE_URL`, `JWT_SECRET` e `JWT_REFRESH_SECRET`.
-   - **Nota sobre IPv6/Docker:** em ambientes sem roteamento IPv6 de saída, configure `DATABASE_URL` usando a URI do **Supabase Session Pooler (IPv4)** em vez do host direto `db.<project_ref>.supabase.co`.
-   - **Nota sobre `COOKIE_SECURE`:** em produção atrás de HTTPS mantenha `COOKIE_SECURE=true` (padrão quando `NODE_ENV=production`); exclusivamente para testar o Docker Compose em `http://localhost:8080` sem TLS, defina `COOKIE_SECURE=false`.
+   - **Nota sobre IPv6/Docker:** a rede `hr-hunter-net` habilita `enable_ipv6: true` para comunicação direta com o Supabase via IPv6 em hosts Docker compatíveis; em ambientes sem roteamento IPv6 de saída, configure `DATABASE_URL` usando a URI do **Supabase Session Pooler (IPv4)** em vez do host direto `db.<project_ref>.supabase.co`.
+   - **Nota sobre `COOKIE_SECURE`:** em produção atrás de HTTPS mantenha `COOKIE_SECURE=true` (padrão quando `NODE_ENV=production`); exclusivamente para testar o Docker Compose em `http://localhost:8081` sem TLS, defina `COOKIE_SECURE=false`.
 2. Execute:
 
 ```bash
@@ -159,9 +159,9 @@ docker build -t hr-hunter-frontend:local --build-arg VITE_API_BASE_URL=/api/v1 .
 ```
 
 3. Endpoints em container:
-   - **Frontend SPA:** `http://localhost:8080`
-   - **API via Proxy Nginx:** `http://localhost:8080/api/v1/health`
-   - **API Direta / Swagger UI:** `http://localhost:3000/api/docs`
+   - **Frontend SPA:** `http://localhost:8081`
+   - **API via Proxy Nginx:** `http://localhost:8081/api/v1/health`
+   - **API Direta / Swagger UI:** `http://localhost:3000/api/docs` (ou `http://localhost:8081/api/docs`)
 
 ---
 
