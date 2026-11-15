@@ -1,4 +1,4 @@
-export type StatusVariant = 'success' | 'warning' | 'danger' | 'neutral';
+export type StatusVariant = 'success' | 'warning' | 'danger' | 'neutral' | 'info';
 
 export interface StatusBadgeProps {
   status: StatusVariant;

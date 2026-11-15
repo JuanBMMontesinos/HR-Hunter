@@ -4,6 +4,21 @@ Todas as mudanças notáveis do projeto **HR Hunter** serão documentadas neste 
 
 ## [Unreleased]
 
+### Added — Fase F4 (Frontend Base, Design System, Auth, RBAC Granular & Componentes Comuns)
+- **Design System & Componentes Comuns (`frontend/src/styles/globals.css`, `frontend/src/components/common/`):**
+  - Mantidos `Button` (+ variante `danger` / `size`), `StatusBadge` (+ variante `info`), `LanguageSwitcher` e `PageHeader`.
+  - Adicionados `Loader` / `Skeleton`, `Input` (dicas não obstrutivas acima do campo, `:user-invalid`/`:user-valid`, `aria-describedby` dinâmico e toggle mostrar/ocultar senha `aria-pressed`), `Select`, `Autocomplete` acessível por teclado, `FilterBar` (`<search>`), `DataTable` (`<caption>`, ordenação `<th scope="col">` + `aria-sort` + `role="status"` + layout móvel empilhado via `@container`), `Modal` (`<dialog>` top-layer com `overscroll-behavior: contain` no `:modal` e `::backdrop`), `ToastViewport` e `RichTextEditor` (variáveis de template + sanitização XSS na pré-visualização).
+- **Layout, i18n & Utilitários (`frontend/src/components/layout/`, `frontend/src/utils/`, `frontend/src/i18n/`):**
+  - Criados `MainLayout` (skip link `#main-content`), `Sidebar` (280px expandido / 72px recolhido / drawer `<dialog>` móvel filtrados dinamicamente por RBAC) e `Header` (popover de notificações com contagem de não lidas + mark-read, idioma e menu do usuário).
+  - Adicionados `stageTranslation.ts` (tradução das 9 etapas padrão preservando etapas customizadas), `passwordPolicy.ts`, `sanitizer.ts` (`Element.prototype.setHTML` + fallback `dompurify`) e expansão completa de `pt-BR.json` e `en-US.json`.
+- **Auth, RBAC Granular & Rotas (`frontend/src/contexts/`, `frontend/src/components/auth/`, `frontend/src/pages/`):**
+  - `api.ts` e `authService.ts` com `withCredentials: true`, retry único single-flight em `401` (sem loop em rotas públicas) e leitura de erros estruturados `parseApiError`.
+  - `AuthContext` com persistência em reload via cookie `HttpOnly` e refresh agendado pré-expiração; `PermissionsContext` com cache `localStorage` (`TTL 5 min`) + sincronia sem *race condition*; `RoleProtectedRoute` aguardando `authLoading || permissionsLoading` antes de decidir redirecionamento.
+  - Páginas `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied` e shells autenticados em `App.tsx` / `ModuleShellPage.tsx`.
+- **Testes Playwright (`55/55` aprovados):**
+  - Component Tests (`18/18`): `CommonWidgets.spec.tsx` (6), `AuthAndRbac.spec.tsx` (6) e 6 testes base da Fase 1.
+  - Unit, API & E2E (`37/37`): `tests/unit/stageTranslation.spec.ts` (3), atualização de `tests/e2e/smoke.spec.ts` (1) e `tests/e2e/auth.spec.ts` (3) integrados ao Supabase PostgreSQL real (`0` falhas, `0` pulados).
+
 ### Added — Fase F3 (Backend CRUDs Core, Dashboard Analytics & Settings)
 - **Módulos CRUD Completos (`backend/validators/`, `backend/services/`, `backend/controllers/`, `backend/routes/`):**
   - **Empresas (`/api/v1/companies`):** paginação limitada (`<= 20`/pág), validação de CNPJ único (`409`), estatísticas de vagas/candidatos e soft delete com guarda contra vagas ativas (`409`).

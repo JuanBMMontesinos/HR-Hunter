@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "HR Hunter",
-    "subtitle": "Plataforma de Recrutamento Global — Fundação Fase 1",
+    "subtitle": "Plataforma de Recrutamento e Seleção",
     "skipToContent": "Ir para o conteúdo principal"
   },
   "common": {
@@ -13,7 +13,16 @@
     "error": "Erro",
     "success": "Sucesso",
     "refresh": "Atualizar",
-    "language": "Idioma"
+    "language": "Idioma",
+    "close": "Fechar",
+    "back": "Voltar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpar",
+    "actions": "Ações",
+    "optional": "Opcional",
+    "required": "Obrigatório",
+    "selectPlaceholder": "Selecione uma opção..."
   },
   "status": {
     "connected": "Supabase Conectado",
@@ -23,6 +32,119 @@
     "pending": "Pendente",
     "inactive": "Inativo"
   },
+  "nav": {
+    "sidebarLabel": "Navegação principal",
+    "dashboard": "Dashboard",
+    "companies": "Empresas",
+    "jobOpenings": "Vagas",
+    "candidates": "Candidatos",
+    "processes": "Processos",
+    "users": "Usuários",
+    "settings": "Configurações",
+    "profile": "Meu Perfil",
+    "logout": "Sair",
+    "openMenu": "Abrir menu de navegação",
+    "closeMenu": "Fechar menu de navegação",
+    "collapseSidebar": "Recolher menu lateral",
+    "expandSidebar": "Expandir menu lateral"
+  },
+  "header": {
+    "notifications": "Notificações",
+    "noNotifications": "Nenhuma notificação recente.",
+    "markAllRead": "Marcar todas como lidas",
+    "markRead": "Marcar como lida",
+    "unreadCount": "{{count}} não lidas",
+    "userMenu": "Menu do usuário",
+    "signedInAs": "Conectado como {{role}}"
+  },
+  "auth": {
+    "loginTitle": "Entrar no HR Hunter",
+    "loginSubtitle": "Acesse sua conta corporativa para gerenciar vagas, candidatos e processos.",
+    "emailLabel": "E-mail corporativo",
+    "emailHint": "Formato: nome@empresa.com",
+    "emailPlaceholder": "recrutador@hrhunter.com",
+    "emailInvalid": "Informe um endereço de e-mail válido no formato nome@empresa.com.",
+    "passwordLabel": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "passwordRequired": "A senha é obrigatória.",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "passwordRevealWarning": "Atenção: isto exibirá sua senha na tela.",
+    "submitLogin": "Entrar",
+    "submittingLogin": "Autenticando...",
+    "forgotPasswordLink": "Esqueci minha senha",
+    "backToLogin": "Voltar para o login",
+    "lockoutMessage": "Conta temporariamente bloqueada após múltiplas tentativas inválidas. Aguarde antes de tentar novamente.",
+    "rateLimitMessage": "Muitas tentativas de login detectadas. Aguarde um instante antes de tentar novamente.",
+    "invalidCredentials": "E-mail ou senha inválidos.",
+    "inactiveAccount": "Sua conta está desativada. Contate o administrador.",
+    "sessionExpired": "Sua sessão expirou. Faça login novamente.",
+    "forgotTitle": "Recuperar senha",
+    "forgotSubtitle": "Informe o e-mail cadastrado para receber as instruções de redefinição.",
+    "forgotSubmit": "Enviar instruções",
+    "forgotSuccess": "Se o e-mail estiver cadastrado e ativo, você receberá um link para redefinir sua senha.",
+    "resetTitle": "Redefinir senha",
+    "resetSubtitle": "Crie uma nova senha forte que atenda a todos os requisitos de segurança.",
+    "tokenLabel": "Token de redefinição",
+    "tokenPlaceholder": "Cole o token recebido por e-mail",
+    "tokenInvalid": "O token deve possuir ao menos 16 caracteres.",
+    "newPasswordLabel": "Nova senha",
+    "confirmPasswordLabel": "Confirmar nova senha",
+    "confirmPasswordMismatch": "As senhas informadas não conferem.",
+    "resetSubmit": "Salvar nova senha",
+    "resetSuccess": "Senha redefinida com sucesso! Você já pode entrar com a nova senha.",
+    "passwordRulesTitle": "Requisitos de senha:",
+    "passwordRules": {
+      "minLength": "Pelo menos {{count}} caracteres",
+      "uppercase": "Ao menos uma letra maiúscula (A-Z)",
+      "lowercase": "Ao menos uma letra minúscula (a-z)",
+      "number": "Ao menos um número (0-9)",
+      "special": "Ao menos um caractere especial (!@#$...)",
+      "strengthLabel": "Força da senha:",
+      "weak": "Fraca",
+      "medium": "Média",
+      "strong": "Forte"
+    },
+    "accessDeniedTitle": "Acesso negado",
+    "accessDeniedDescription": "Seu perfil ({{role}}) não possui permissão para acessar esta área.",
+    "accessDeniedResource": "Recurso solicitado: {{resource}}",
+    "backToDashboard": "Ir para o início",
+    "logoutSuccess": "Sessão encerrada com sucesso."
+  },
+  "table": {
+    "searchPlaceholder": "Buscar...",
+    "clearFilters": "Limpar filtros",
+    "noResults": "Nenhum registro encontrado.",
+    "loading": "Carregando dados...",
+    "sortedStatus": "Ordenado por {{column}}, {{direction}}, {{count}} registros",
+    "ascending": "ordem crescente",
+    "descending": "ordem decrescente",
+    "previousPage": "Anterior",
+    "nextPage": "Próxima",
+    "pageInfo": "Página {{page}} de {{totalPages}}",
+    "totalItems": "{{total}} registros"
+  },
+  "editor": {
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "underline": "Sublinhado",
+    "list": "Lista",
+    "insertVariable": "Variáveis:",
+    "sourceLabel": "Conteúdo HTML do template",
+    "previewLabel": "Pré-visualização sanitizada",
+    "sanitizedNotice": "Scripts e atributos inseguros são removidos automaticamente."
+  },
+  "stages": {
+    "candidatura_recebida": "Candidatura Recebida",
+    "triagem_cv": "Triagem CV",
+    "entrevista_telefonica": "Entrevista Telefônica",
+    "entrevista_tecnica": "Entrevista Técnica",
+    "dinamica_de_grupo": "Dinâmica de Grupo",
+    "entrevista_com_gestor": "Entrevista com Gestor",
+    "oferta": "Oferta",
+    "contratado": "Contratado",
+    "rejeitado": "Rejeitado"
+  },
   "phase1": {
     "heading": "Arquitetura Base & Conexão Supabase",
     "description": "Sistema inicializado com Design System oficial, backend Express conectado ao PostgreSQL no Supabase, i18n PT-BR/EN-US e suíte de testes Playwright.",
@@ -30,6 +152,18 @@
     "designSystemLabel": "Design System",
     "designSystemStatus": "Tokens carregados (Poppins + WCAG 2.1 AA)",
     "nextPhaseLabel": "Próxima Fase",
-    "nextPhaseValue": "Fase F2 — Autenticação JWT, Permissões Granulares e Segurança"
+    "nextPhaseValue": "Fase F5 — Telas CRUD, Dashboard Completo e Settings"
+  },
+  "pages": {
+    "moduleReady": "Módulo autenticado e autorizado via RBAC granular. Interface completa prevista na Fase F5.",
+    "currentPermissions": "Permissões ativas na sessão",
+    "dashboardSubtitle": "Indicadores estratégicos e acompanhamento de processos críticos.",
+    "companiesSubtitle": "Gestão de empresas clientes e contratos ativos.",
+    "jobOpeningsSubtitle": "Abertura, triagem e acompanhamento de vagas.",
+    "candidatesSubtitle": "Banco de talentos, currículo, experiência e importação CSV.",
+    "processesSubtitle": "Quadro Kanban de processos seletivos, avaliações e propostas.",
+    "usersSubtitle": "Administração de contas, perfis de acesso e atividade.",
+    "profileSubtitle": "Atualize seus dados cadastrais e preferências pessoais.",
+    "settingsSubtitle": "Parâmetros gerais, funis de etapas, templates, segurança e auditoria."
   }
 }

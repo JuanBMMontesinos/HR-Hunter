@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "HR Hunter",
-    "subtitle": "Global Recruitment Platform — Phase 1 Foundation",
+    "subtitle": "Global Recruitment & Talent Platform",
     "skipToContent": "Skip to main content"
   },
   "common": {
@@ -13,7 +13,16 @@
     "error": "Error",
     "success": "Success",
     "refresh": "Refresh",
-    "language": "Language"
+    "language": "Language",
+    "close": "Close",
+    "back": "Back",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "actions": "Actions",
+    "optional": "Optional",
+    "required": "Required",
+    "selectPlaceholder": "Select an option..."
   },
   "status": {
     "connected": "Supabase Connected",
@@ -23,6 +32,119 @@
     "pending": "Pending",
     "inactive": "Inactive"
   },
+  "nav": {
+    "sidebarLabel": "Main navigation",
+    "dashboard": "Dashboard",
+    "companies": "Companies",
+    "jobOpenings": "Job Openings",
+    "candidates": "Candidates",
+    "processes": "Processes",
+    "users": "Users",
+    "settings": "Settings",
+    "profile": "My Profile",
+    "logout": "Sign out",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
+  },
+  "header": {
+    "notifications": "Notifications",
+    "noNotifications": "No recent notifications.",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "unreadCount": "{{count}} unread",
+    "userMenu": "User menu",
+    "signedInAs": "Signed in as {{role}}"
+  },
+  "auth": {
+    "loginTitle": "Sign in to HR Hunter",
+    "loginSubtitle": "Access your workspace to manage job openings, candidates, and hiring pipelines.",
+    "emailLabel": "Work email",
+    "emailHint": "Format: name@company.com",
+    "emailPlaceholder": "recruiter@hrhunter.com",
+    "emailInvalid": "Enter a valid email address in the format name@company.com.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "passwordRequired": "Password is required.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "passwordRevealWarning": "Warning: this will display your password on the screen.",
+    "submitLogin": "Sign In",
+    "submittingLogin": "Signing in...",
+    "forgotPasswordLink": "Forgot my password",
+    "backToLogin": "Back to sign in",
+    "lockoutMessage": "Account temporarily locked due to repeated invalid attempts. Please wait before trying again.",
+    "rateLimitMessage": "Too many login attempts detected. Please wait briefly before retrying.",
+    "invalidCredentials": "Invalid email or password.",
+    "inactiveAccount": "Your account is inactive. Contact your administrator.",
+    "sessionExpired": "Your session expired. Please sign in again.",
+    "forgotTitle": "Reset your password",
+    "forgotSubtitle": "Enter your registered email to receive password reset instructions.",
+    "forgotSubmit": "Send instructions",
+    "forgotSuccess": "If the email exists and is active, reset instructions will be sent shortly.",
+    "resetTitle": "Set a new password",
+    "resetSubtitle": "Choose a strong password that satisfies every security requirement.",
+    "tokenLabel": "Reset token",
+    "tokenPlaceholder": "Paste the token from your email",
+    "tokenInvalid": "Token must be at least 16 characters long.",
+    "newPasswordLabel": "New password",
+    "confirmPasswordLabel": "Confirm new password",
+    "confirmPasswordMismatch": "Passwords do not match.",
+    "resetSubmit": "Save new password",
+    "resetSuccess": "Password updated successfully! You can now sign in with your new password.",
+    "passwordRulesTitle": "Password requirements:",
+    "passwordRules": {
+      "minLength": "At least {{count}} characters",
+      "uppercase": "At least one uppercase letter (A-Z)",
+      "lowercase": "At least one lowercase letter (a-z)",
+      "number": "At least one number (0-9)",
+      "special": "At least one special character (!@#$...)",
+      "strengthLabel": "Password strength:",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "accessDeniedTitle": "Access denied",
+    "accessDeniedDescription": "Your role ({{role}}) does not have permission to access this area.",
+    "accessDeniedResource": "Requested resource: {{resource}}",
+    "backToDashboard": "Go to home",
+    "logoutSuccess": "Signed out successfully."
+  },
+  "table": {
+    "searchPlaceholder": "Search...",
+    "clearFilters": "Clear filters",
+    "noResults": "No records found.",
+    "loading": "Loading records...",
+    "sortedStatus": "Sorted by {{column}}, {{direction}}, {{count}} rows",
+    "ascending": "ascending",
+    "descending": "descending",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pageInfo": "Page {{page}} of {{totalPages}}",
+    "totalItems": "{{total}} records"
+  },
+  "editor": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "list": "List",
+    "insertVariable": "Variables:",
+    "sourceLabel": "Template HTML source",
+    "previewLabel": "Sanitized preview",
+    "sanitizedNotice": "Unsafe scripts and attributes are automatically stripped."
+  },
+  "stages": {
+    "candidatura_recebida": "Application Received",
+    "triagem_cv": "Resume Screening",
+    "entrevista_telefonica": "Phone Interview",
+    "entrevista_tecnica": "Technical Interview",
+    "dinamica_de_grupo": "Group Dynamics",
+    "entrevista_com_gestor": "Hiring Manager Interview",
+    "oferta": "Job Offer",
+    "contratado": "Hired",
+    "rejeitado": "Rejected"
+  },
   "phase1": {
     "heading": "Base Architecture & Supabase Connection",
     "description": "Workspace initialized with official Design System, Express backend connected to Supabase PostgreSQL, PT-BR/EN-US i18n, and Playwright testing suite.",
@@ -30,6 +152,18 @@
     "designSystemLabel": "Design System",
     "designSystemStatus": "Tokens active (Poppins + WCAG 2.1 AA)",
     "nextPhaseLabel": "Next Phase",
-    "nextPhaseValue": "Phase F2 — JWT Auth, Granular Permissions & Security"
+    "nextPhaseValue": "Phase F5 — Full CRUD Pages, Analytics Dashboard & Settings"
+  },
+  "pages": {
+    "moduleReady": "Authenticated and authorized via granular RBAC. Full interactive screens arrive in Phase F5.",
+    "currentPermissions": "Active session permissions",
+    "dashboardSubtitle": "Key metrics and critical pipeline monitoring.",
+    "companiesSubtitle": "Client companies and active contracts management.",
+    "jobOpeningsSubtitle": "Opening creation, funnel assignment, and tracking.",
+    "candidatesSubtitle": "Talent pool, profiles, experience, and CSV bulk import.",
+    "processesSubtitle": "Kanban recruitment board, feedback, and job offers.",
+    "usersSubtitle": "User accounts, access roles, and activity history.",
+    "profileSubtitle": "Update your personal details and language preferences.",
+    "settingsSubtitle": "General configuration, funnels, templates, security, and audit."
   }
 }

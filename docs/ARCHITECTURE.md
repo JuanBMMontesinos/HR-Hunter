@@ -1,6 +1,6 @@
 # Arquitetura do Sistema — HR Hunter (v2.0)
 
-**Versão:** 2.0 (Fase 3 — CRUDs Core, Dashboard Analytics & Settings)  
+**Versão:** 2.0 (Fase 4 — Frontend Base, Design System, Auth & RBAC Granular)  
 **Última Atualização:** 2026-11-15  
 
 ---
@@ -63,13 +63,21 @@ HR-Hunter/
 ├── frontend/
 │   ├── playwright/              # Harness do Playwright Component Testing
 │   ├── src/
-│   │   ├── components/common/   # Button, StatusBadge, PageHeader, LanguageSwitcher
+│   │   ├── components/
+│   │   │   ├── auth/            # LoginForm, PasswordStrengthMeter, PrivateRoute, RoleProtectedRoute
+│   │   │   ├── common/          # Button, StatusBadge, LanguageSwitcher, PageHeader, Loader, Input, Select, Autocomplete, FilterBar, DataTable, Modal, Toast, RichTextEditor
+│   │   │   └── layout/          # Header (notificações + menu usuário), Sidebar (desktop/mobile <dialog>), MainLayout
+│   │   ├── contexts/            # AuthContext, PermissionsContext, ToastContext
+│   │   ├── hooks/               # usePermissions
 │   │   ├── i18n/                # react-i18next (pt-BR, en-US)
-│   │   ├── services/api.ts      # Cliente Axios (/api/v1) e tipos de health check
+│   │   ├── pages/               # auth (Login, ForgotPassword, ResetPassword, AccessDenied) + ModuleShellPage
+│   │   ├── services/            # api.ts (Axios single-flight 401 + notificações), authService.ts
 │   │   ├── styles/              # variables.css (design-system.json) + globals.css
-│   │   ├── App.tsx
+│   │   ├── types/               # auth.ts, common.ts
+│   │   ├── utils/               # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts
+│   │   ├── App.tsx              # BrowserRouter + guards RBAC + ToastViewport
 │   │   └── main.tsx
-│   ├── tests/ct/                # Testes unitários de componentes React (Playwright CT)
+│   ├── tests/ct/                # Testes unitários de componentes React (Playwright CT) + harnesses/
 │   ├── playwright-ct.config.ts
 │   ├── tsconfig.json
 │   ├── vite.config.ts
@@ -111,3 +119,18 @@ HR-Hunter/
    - **Domínio:** `companyService.js`, `jobOpeningService.js`, `candidateService.js`, `processService.js`, `userService.js`, `dashboardService.js` e `settingsService.js` (com respectivos controllers e validadores Joi).
    - **Utilitários Compartilhados:** `queryHelpers.js` (`parsePagination`, `SqlFilterBuilder`, `buildDynamicUpdate`, `handlePgError`), `csvParser.js` (parser RFC-4180 com autodetecção `,`/`;` e BOM) e `responseHelper.js` (`sendSuccess`, `actorMeta`).
    - **Integridade Transacional:** criação de candidatos com sub-recursos e processos seletivos em `withTransaction`, serialização de queries por cliente `pg` e leitura pós-`COMMIT`.
+
+---
+
+## 4. Arquitetura Frontend Base, Auth & RBAC (Fase 4)
+
+1. **Cliente HTTP & Sessão (`services/api.ts`, `services/authService.ts`, `contexts/AuthContext.tsx`):**
+   - `apiClient` configurado com `withCredentials: true` (enviando cookie `HttpOnly` `hr_refresh_token`), header automático `Authorization: Bearer`, agendamento proativo pré-expiração (45s antes de `exp`) e interceptor `401` single-flight para evitar replay durante rotação de tokens.
+2. **RBAC Granular & Guarda Anti-Race Condition (`contexts/PermissionsContext.tsx`, `components/auth/RoleProtectedRoute.tsx`):**
+   - `PermissionsContext` hidrata permissões via resposta inicial ou cache `localStorage` (`TTL 5 min`) e sincroniza `GET /api/v1/auth/permissions`.
+   - `RoleProtectedRoute` bloqueia qualquer decisão de redirecionamento exibindo `<Loader />` enquanto `authLoading || permissionsLoading` forem verdadeiros, eliminando flashes falsos para `/access-denied`.
+3. **Biblioteca de UI Acessível & Moderna (`components/common/`, `components/layout/`, `utils/sanitizer.ts`):**
+   - Modais e gaveta móvel usam `<dialog>` nativo (`showModal()`, top-layer, `overscroll-behavior: contain` no `:modal` e `::backdrop`).
+   - `DataTable` usa `@container (width < 600px)` para cards empilhados, `<th scope="col">` ordenáveis com `aria-sort` e anúncios `role="status"`.
+   - `RichTextEditor` sanitiza HTML via `Element.prototype.setHTML` nativo quando suportado, com fallback para `dompurify`.
+   - `stageTranslation.ts` traduz as 9 etapas padrão PT-BR ↔ EN-US preservando etapas customizadas intactas.

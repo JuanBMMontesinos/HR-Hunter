@@ -2,11 +2,11 @@
 
 Plataforma web de gestão de recrutamento e seleção (ATS/CRM) construída com **React + Vite + TypeScript**, **Node.js + Express**, **Supabase (PostgreSQL)** e suíte unificada de testes com **Playwright**.
 
-> **Status Atual:** Fase `F3` concluída (CRUDs `/companies`, `/job-openings`, `/candidates` + import CSV, `/processes` Kanban/ofertas/timeline, `/users`, `/dashboard/*`, `/settings/*` + backup lógico e `37/37` testes Playwright aprovados). Próxima etapa: **Fase `F4`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
+> **Status Atual:** Fase `F4` concluída (Design System `design-system.json`, biblioteca de componentes acessíveis + `MainLayout`, i18n completo com `stageTranslation.ts`, `AuthContext` com refresh cookie `HttpOnly` + single-flight `401`, `PermissionsContext` + `RoleProtectedRoute` sem race condition, telas `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied` e `55/55` testes Playwright aprovados). Próxima etapa: **Fase `F5`** conforme [`docs/PLANO_MESTRE.md`](docs/PLANO_MESTRE.md).
 
 ## Stack Implementada
 
-- **Frontend:** React 18, Vite 6, TypeScript 5.7, CSS Layers + Custom Properties (`design-system.json`), `react-i18next` (`pt-BR` / `en-US`), Axios, Lucide React
+- **Frontend:** React 18, React Router 7, Vite 6, TypeScript 5.7, CSS Layers + Custom Properties (`design-system.json`), `react-i18next` (`pt-BR` / `en-US`), Axios, Lucide React, DOMPurify (`setHTML` nativo com fallback)
 - **Backend:** Node.js, Express, `pg` (PostgreSQL), `jsonwebtoken`, `bcrypt`, `joi`, `pdfkit`, `nodemailer`, `node-cron`, Helmet, CORS restritivo, `express-rate-limit`, Winston, Swagger/OpenAPI (`/api/docs`, `/api/docs.json`)
 - **Banco de Dados:** Supabase (PostgreSQL Manageado, `project_ref=fhhgtjzwmhgdiokqqebg`)
 - **Testes:** Playwright (`@playwright/test` para unit/API/E2E e `@playwright/experimental-ct-react` para testes unitários de componentes)
@@ -45,13 +45,18 @@ HR-Hunter/
 ├── frontend/
 │   ├── playwright/                            # Harness do Playwright Component Testing
 │   ├── src/
-│   │   ├── components/common/                 # Button, StatusBadge, LanguageSwitcher, PageHeader
+│   │   ├── components/                        # auth/, common/ e layout/ (Header, Sidebar, MainLayout)
+│   │   ├── contexts/                          # AuthContext, PermissionsContext, ToastContext
+│   │   ├── hooks/                             # usePermissions
 │   │   ├── i18n/                              # react-i18next (pt-BR, en-US)
-│   │   ├── services/api.ts                    # Cliente Axios (/api/v1)
+│   │   ├── pages/                             # auth/ e ModuleShellPage
+│   │   ├── services/                          # api.ts (Axios single-flight 401), authService.ts
 │   │   ├── styles/                            # variables.css + globals.css
+│   │   ├── types/                             # auth.ts, common.ts
+│   │   ├── utils/                             # passwordPolicy.ts, sanitizer.ts, stageTranslation.ts
 │   │   ├── App.tsx
 │   │   └── main.tsx
-│   ├── tests/ct/                              # Testes unitários de componentes React (Playwright CT)
+│   ├── tests/ct/                              # Testes unitários de componentes React (Playwright CT) + harnesses/
 │   ├── playwright-ct.config.ts
 │   ├── tsconfig.json
 │   └── vite.config.ts

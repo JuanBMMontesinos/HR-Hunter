@@ -50,18 +50,21 @@ npm run build:frontend
 
 ---
 
-## 4. Cobertura Atual (Fase 3 — Verificada)
+## 4. Cobertura Atual (Fase 4 — Verificada)
 
-- **Component Unit Tests (`npm run test:ct`) — 6/6 aprovados:**
+- **Component Unit Tests (`npm run test:ct`) — `18/18` aprovados:**
+  - `frontend/tests/ct/AuthAndRbac.spec.tsx` (6 testes): guarda anti-race-condition de `RoleProtectedRoute` (`permissionsLoading`), renderização autorizada vs redirecionamento para `/access-denied`, validação pós-interação + atributos `autocomplete` + botão mostrar/ocultar senha (`aria-pressed`) + alertas `401`/`423` no `LoginForm`, medidor `PasswordStrengthMeter` (5 regras) e filtragem dinâmica RBAC do `Sidebar`.
+  - `frontend/tests/ct/CommonWidgets.spec.tsx` (6 testes): `DataTable` (`caption`, ordenação `<th scope="col">` com `aria-sort` e live status, skeletons de loading, estado vazio e paginação), `Modal` top-layer (`<dialog>` + tecla `Escape`) e `ToastViewport`, sanitização XSS no `RichTextEditor` (`<script>` e `onerror` removidos), `FilterBar` + `Select` + `Autocomplete`.
   - `frontend/tests/ct/Button.spec.tsx` (3 testes): variantes `solid`/`ghost`/`neutral`, click handler, estado `disabled`, foco por teclado e altura mínima WCAG `44px`.
   - `frontend/tests/ct/StatusBadge.spec.tsx` (1 teste): variantes semânticas `success`, `warning`, `danger` e `neutral`.
   - `frontend/tests/ct/LanguageSwitcher.spec.tsx` (1 teste): alternância `PT-BR` ↔ `EN-US`, persistência em `localStorage` (`hr_hunter_lang`) e atualização de `document.documentElement.lang`.
   - `frontend/tests/ct/PageHeader.spec.tsx` (1 teste): landmark `banner`, título, subtítulo, slot de ações e `LanguageSwitcher`.
-- **Root Suite (`npm test`) — 31/31 aprovados (`15` unit + `15` api + `1` e2e):**
+- **Root Suite (`npm test`) — `37/37` aprovados (`18` unit + `15` api + `4` e2e):**
   - `tests/unit/dbMapper.spec.ts` (4 testes): conversão `snake_case` → `camelCase` (incluindo dígitos como `last_24h`), mapeamento de coleções, normalização de strings vazias opcionais (`cpf`) e instâncias `Date` (ISO UTC ou `null`), e construção de `AppError`.
   - `tests/unit/auth.spec.ts` (3 testes): política de senha forte (`validatePasswordStrength`), assinatura/verificação JWT e hash SHA-256 determinístico (`tokenUtils`), proteção contra XSS e *CSV formula injection* (`sanitizer`).
   - `tests/unit/permissions.spec.ts` (4 testes): cálculo de risco `0..100` e classificação (`computeRiskScore`, `classifyRiskLevel`), recomendações automáticas (`buildRecommendations`), gatilhos de alerta (`evaluateAlertThresholds`: ≥5 usuário `HIGH`, ≥10 IP `CRITICAL`) e redação recursiva de segredos em `audit_log` (`redactSensitiveValues`).
   - `tests/unit/phase3-helpers.spec.ts` (4 testes): parser CSV com BOM UTF-8, delimitador `;` e aspas (`parseCsvText`), paginação e construtores SQL (`queryHelpers`), renderização de templates com escape XSS (`renderTemplate`), e normalização de `salaryMin`/`salaryMax` (`createJobOpeningSchema`).
+  - `tests/unit/stageTranslation.spec.ts` (3 testes): tradução das 9 etapas padrão PT-BR ↔ EN-US (`translateStageName`), normalização acentuada (`normalizeStageSlug`) preservando etapas customizadas, e avaliação client-side `evaluatePasswordStrength`.
   - `tests/api/health-and-schema.spec.ts` (3 testes): saúde da API + latência do Supabase (`GET /api/v1/health`), especificação OpenAPI (`GET /api/docs.json`) e verificação no Supabase das 7 migrations (`001`–`007`), 27 tabelas, 3 views, 8 funções, triggers e dados iniciais.
   - `tests/api/auth.spec.ts` (3 testes): login JWT + cookie `HttpOnly`, `/auth/me`, `/auth/permissions`, rotação de refresh token com detecção de replay e revogação no logout, bloqueio por 5 senhas incorretas (`423`) + `loginLimiter` na 6ª tentativa (`429`), e fluxo `forgot-password` / `reset-password` com validação de política.
   - `tests/api/permissions-and-security.spec.ts` (3 testes): gestão da matriz RBAC, proteção de `Admin` (`403`), invalidação de cache e registro `PERMISSION_CHANGE` em `audit_log`; escalação de ≥5 tentativas `403` para alerta `HIGH` + notificação a admins + resolução; exportações CSV (`UTF-8` com BOM + `;`) e PDF (`pdfkit`), geração de `SecurityReports` e execução de retenção de dados.
@@ -71,9 +74,10 @@ npm run build:frontend
   - `tests/api/processes.spec.ts` (1 teste): visão Kanban, transição `/next-stage`, fluxo `/offer` → `Aceita` → `Contratado` (`Concluído`), `/reject` e `/timeline`.
   - `tests/api/users.spec.ts` (1 teste): CRUD restrito ao perfil `Admin`, atualização restrita de autoperfil, `/activity`, `/reset-password` e soft delete.
   - `tests/api/dashboard-and-settings.spec.ts` (1 teste): `/dashboard/kpis`, `/analytics`, `/critical-processes`, mascaramento `is_sensitive` em `/settings`, CRUD de etapas/funis/templates com sanitização XSS, proteção `is_system` (`403`), `/audit-log`, `/login-history` e `/backup`.
-  - `tests/e2e/smoke.spec.ts` (1 teste): carregamento da UI em `http://localhost:5173`, badge vivo `Supabase Conectado` e troca dinâmica `PT-BR` ↔ `EN-US`.
+  - `tests/e2e/smoke.spec.ts` (1 teste): redirecionamento `/` → `/login`, badge vivo `Supabase Conectado` e troca dinâmica `PT-BR` ↔ `EN-US`.
+  - `tests/e2e/auth.spec.ts` (3 testes): alerta em credenciais inválidas, login real como `Recrutador` no Supabase + filtragem dinâmica do `Sidebar` + bloqueio em `/users` (`/access-denied`) + persistência em reload via cookie `HttpOnly` + logout, e roundtrip UI completo de `/forgot-password` → `/reset-password?token=...` → login com nova senha (com limpeza em `afterAll`).
 
-**Total consolidado na Fase 3:** `37/37` testes Playwright aprovados (`0` falhas, `0` pulados).
+**Total consolidado na Fase 4:** `55/55` testes Playwright aprovados (`0` falhas, `0` pulados).
 
 ---
 

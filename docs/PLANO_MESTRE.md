@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟢 F3 — Backend CRUDs Core, Dashboard Analytics & Settings Concluído (Próxima: F4)  
+**Status Atual:** 🟢 F4 — Frontend Base, Design System, Auth & RBAC Concluída (Próxima: F5)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -99,11 +99,11 @@ As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabas
 - [x] Implementar Settings (Geral, Funis/Etapas, Email Templates, Audit/Login History, Snapshot lógico)
 - [x] Cobrir 100% dos endpoints com testes Playwright integrados ao Supabase (`37/37` aprovados) + atualizar `docs/API.md` e Swagger (`68` paths / `95` operações)
 
-### Fase F4 — Frontend Base, Design System, Auth & RBAC ⏳ Próxima
-- [ ] Implementar tokens de `design-system.json` (`variables.css`), componentes comuns (`PageHeader`, `FilterBar`, `DataTable`, `StatusBadge`, `Modal`, `Toast`, `RichTextEditor`)
-- [ ] Configurar i18n completo (`pt-BR.json`, `en-US.json`, `stageTranslation.ts`)
-- [ ] Implementar `AuthContext`, `PermissionsContext`, `RoleProtectedRoute` (aguardando ambos loadings), `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied`
-- [ ] Criar testes unitários de componentes com Playwright CT (`frontend/tests/ct/`) e E2E de auth (`tests/e2e/auth.spec.ts`)
+### Fase F4 — Frontend Base, Design System, Auth & RBAC ✅ Concluída
+- [x] Implementar tokens de `design-system.json` (`variables.css`), CSS `@layer` responsivo (`globals.css`), componentes comuns (`Button`, `StatusBadge`, `LanguageSwitcher`, `PageHeader`, `Loader`/`Skeleton`, `Input`, `Select`, `Autocomplete`, `FilterBar`, `DataTable`, `Modal` top-layer `<dialog>`, `Toast`, `RichTextEditor`) e layout (`MainLayout`, `Sidebar` drawer + colapso `280px`/`72px`, `Header` com popover de notificações)
+- [x] Configurar i18n completo (`pt-BR.json`, `en-US.json`, `stageTranslation.ts` traduzindo as 9 etapas padrão preservando etapas customizadas) e `passwordPolicy.ts` / `sanitizer.ts` (`Element.prototype.setHTML` + fallback `dompurify`)
+- [x] Implementar `ToastContext`, `AuthContext` (refresh pre-expiry + interceptor single-flight `401` via cookie `HttpOnly`), `PermissionsContext` (cache TTL 5 min), `usePermissions`, `PrivateRoute`, `RoleProtectedRoute` (bloqueando redirecionamento enquanto `authLoading || permissionsLoading`), `Login`, `ForgotPassword`, `ResetPassword`, `AccessDenied` e shells autenticados de módulo
+- [x] Cobrir componentes, helpers e fluxo E2E com Playwright (`18` Component Tests em `frontend/tests/ct/`, `tests/unit/stageTranslation.spec.ts` e `tests/e2e/auth.spec.ts` = `55/55` aprovados)
 
 ### Fase F5 — Frontend CRUDs, Dashboard & Settings
 - [ ] Implementar páginas `Companies`, `JobOpenings`, `Candidates`, `Processes` (Kanban + Lista + Timeline + Oferta), `Users`

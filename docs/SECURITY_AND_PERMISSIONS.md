@@ -1,7 +1,7 @@
 # Segurança, Autenticação & Permissões RBAC — HR Hunter (v2.0)
 
 **Última Atualização:** 2026-11-15  
-**Escopo:** Fase 2 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics & Retenção  
+**Escopo:** Fases 2 e 4 — Auth JWT, Cookies HttpOnly, Bloqueio por Força Bruta, Matriz RBAC Granular, Alertas, Auditoria, Analytics, Retenção & Segurança no Frontend  
 
 ---
 
@@ -73,3 +73,18 @@ Quando `authorize(resource, action)` ou `requireAdmin` nega acesso (`403 FORBIDD
   - Chaves configuráveis na tabela `configurations` (`category = 'Retention'`): `RetentionAuditLogDays` (90d), `RetentionUnauthorizedAccessDays` (180d), `RetentionLoginHistoryDays` (365d), `RetentionSecurityAlertsDays` (365d, preservando alertas `ACTIVE`), `RetentionNotificationsDays` (30d, apenas notificações lidas).
   - Limpa também `refresh_tokens` expirados/revogados antigos e `password_reset_tokens` expirados/usados.
   - Suporta simulação (`dryRun: true`), execução manual (`POST /api/v1/retention/execute`) e agendamento `node-cron` em `America/Sao_Paulo` (`ENABLE_RETENTION_CRON=true` / produção).
+
+---
+
+## 6. Segurança e RBAC no Frontend (Fase 4)
+
+- **Armazenamento & Renovação de Tokens (`frontend/src/contexts/AuthContext.tsx`, `frontend/src/services/api.ts`):**
+  - O access token JWT permanece apenas em memória React/ref (nunca em `localStorage`), enquanto a renovação silenciosa em reloads utiliza o cookie `HttpOnly` `hr_refresh_token`.
+  - O interceptor de resposta `401` implementa fila única (`inFlightRefresh`) e ignora rotas públicas/auth (`/auth/login`, `/auth/refresh-token`, `/auth/forgot-password`, `/auth/reset-password`), impedindo detecção falsa de replay por requisições simultâneas.
+- **Sincronização RBAC Sem Race Condition (`PermissionsContext.tsx`, `RoleProtectedRoute.tsx`):**
+  - Enquanto `authLoading || permissionsLoading` ou `syncedUserKey !== currentUserKey`, rotas protegidas exibem `<Loader fullScreen />` sem redirecionar para `/access-denied`.
+  - Navegação lateral (`Sidebar.tsx`) filtra os links dinamicamente com `can(resource, action)`.
+- **Sanitização HTML Client-Side (`frontend/src/utils/sanitizer.ts`):**
+  - `safeSetElementHtml` prioriza `Element.prototype.setHTML` nativo quando disponível e utiliza `dompurify` carregado sob demanda com `ALLOW_ARIA_ATTR: false`, `ALLOW_DATA_ATTR: false` e `KEEP_CONTENT: false` na pré-visualização do `RichTextEditor`.
+- **Política de Senha & Formulários (`PasswordStrengthMeter.tsx`, `LoginForm.tsx`):**
+  - Medidor interativo espelha as 5 regras de `backend/utils/passwordPolicy.js`, formulários empregam atributos padrão de gerenciadores de senha (`autocomplete="username"` / `"current-password"` / `"new-password"`) e tratam retornos `401`, `403`, `423 AUTH_004` e `429 AUTH_RATE_LIMIT`.
