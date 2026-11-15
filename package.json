@@ -1,0 +1,28 @@
+{
+  "name": "hr-hunter",
+  "version": "2.0.0",
+  "private": true,
+  "description": "HR Hunter - Global Recruitment Platform (React + Express + Supabase + Playwright)",
+  "scripts": {
+    "install:all": "npm install && npm --prefix backend install && npm --prefix frontend install",
+    "migrate": "node database/scripts/migrate.js",
+    "seed": "node database/scripts/seed.js",
+    "db:setup": "npm run migrate && npm run seed",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "typecheck:frontend": "npm --prefix frontend run typecheck",
+    "test": "npx playwright test",
+    "test:unit": "npx playwright test --project=unit",
+    "test:api": "npx playwright test --project=api",
+    "test:e2e": "npx playwright test --project=e2e",
+    "test:ct": "npm --prefix frontend run test:ct"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.10.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1"
+  }
+}

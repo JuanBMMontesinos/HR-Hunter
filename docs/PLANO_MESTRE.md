@@ -1,6 +1,6 @@
 # HR Hunter — Plano Mestre de Arquitetura & Implementação (v2.0)
 
-**Status Atual:** 🟡 F0 — Planejamento, Prompt Atualizado e Governança Concluídos  
+**Status Atual:** 🟢 F1 — Setup do Monorepo, Banco Supabase, Fundação Backend/Frontend & Playwright Concluídos (Próxima: F2)  
 **Repositório:** `https://github.com/JuanBMMontesinos/HR-Hunter`  
 **Banco de Dados:** Supabase PostgreSQL (`project_ref=fhhgtjzwmhgdiokqqebg`)  
 **Suíte de Testes:** Playwright (`@playwright/test` + `@playwright/experimental-ct-react`)  
@@ -55,18 +55,18 @@ Este documento consolida o novo planejamento do **HR Hunter** a partir dos docum
 
 ## 3. Plano de Migrations no Supabase (`database/migrations/`)
 
-As migrations serão criadas e aplicadas diretamente no Supabase (via MCP `supabase` ou runner Node `pg` com `DATABASE_URL` no `.env` local):
+As migrations são criadas e aplicadas diretamente no Supabase (via MCP `supabase-hr-hunter` ou runner Node `pg` com `DATABASE_URL` no `.env` local):
 
 | Ordem | Arquivo | Tabelas / Objetos | Origem & Adaptação |
 |---:|---|---|---|
 | `001` | `001_core_users_auth.sql` | `schema_migrations`, `users`, `refresh_tokens`, `password_reset_tokens`, `login_history` | Auth + lockout 5 tentativas / 15 min |
-| `002` | `002_companies_jobs.sql` | `companies`, `job_openings` (inclui `funnel_id`) | CNPJ único, soft delete, status/prioridade |
-| `003` | `003_candidates.sql` | `candidates`, `candidate_experience`, `candidate_education`, `candidate_skills` | Índice único parcial em `cpf` permitindo múltiplos `NULL` |
-| `004` | `004_funnels_processes_offers.sql` | `recruitment_stage_template`, `stage_funnels`, `stage_funnel_items`, `recruitment_processes`, `process_stages`, `offers` | Funis customizáveis + Kanban + Ofertas |
-| `005` | `005_settings_email_audit.sql` | `configurations`, `email_templates`, `audit_log` | Templates com `is_system` + auditoria `JSONB` |
-| `006` | `006_permissions_security.sql` | `permissions`, `role_permissions`, `security_alerts`, `notifications`, `unauthorized_access_log`, `security_reports` | RBAC 7×4 + alertas e score de risco |
-| `007` | `007_triggers_views_functions.sql` | `fn_set_updated_at`, `fn_prevent_delete_active_company`, `fn_sync_process_stage`, `vw_*`, `fn_get_dashboard_*`, `fn_move_to_next_stage` | Conversão integral de triggers, views e SPs T-SQL para PL/pgSQL |
-| `seed` | `database/seeds/001_initial_seed.sql` | Etapas padrão, funil padrão, permissões 5 roles, configs, templates, usuários, dados realistas | Garantia de **zero tabelas vazias** |
+| `002` | `002_funnels_and_stages.sql` | `recruitment_stage_template`, `stage_funnels`, `stage_funnel_items` | Catálogo mestre de etapas e funis customizáveis |
+| `003` | `003_companies_and_jobs.sql` | `companies`, `job_openings` (inclui `funnel_id` + índice GIN full-text) | CNPJ único, soft delete, status/prioridade |
+| `004` | `004_candidates.sql` | `candidates`, `candidate_experience`, `candidate_education`, `candidate_skills` | Índice único parcial em `cpf` permitindo múltiplos `NULL` |
+| `005` | `005_processes_and_offers.sql` | `recruitment_processes`, `process_stages`, `offers` | Kanban, timeline com `JSONB` + Ofertas |
+| `006` | `006_settings_email_audit_security.sql` | `configurations`, `email_templates`, `audit_log`, `permissions`, `role_permissions`, `security_alerts`, `notifications`, `unauthorized_access_log`, `security_reports`, `retention_execution_log` | Configs, Templates (`is_system`), Auditoria `JSONB` + RBAC 7×4 + Segurança & Retenção |
+| `007` | `007_triggers_views_functions.sql` | `fn_set_updated_at`, `fn_prevent_delete_active_company`, `fn_sync_process_stage`, `vw_*` (3 views), `fn_get_dashboard_*`, `fn_move_to_next_stage` | Conversão integral de triggers (17), views (3) e funções PL/pgSQL (8) |
+| `seed` | `database/scripts/seed.js` | Etapas padrão, 2 funis, 28 permissões / 69 role-permissions, configs, templates, 5 usuários, empresas, vagas, candidatos e logs | Seed idempotente (`npm run seed`) garantindo zero tabelas de domínio/configuração vazias |
 
 ---
 
@@ -80,14 +80,14 @@ As migrations serão criadas e aplicadas diretamente no Supabase (via MCP `supab
 - [x] Criação do `docs/PLANO_MESTRE.md`, `README.md` e `CHANGELOG.md`
 - [x] Validação de conectividade IPv6/porta 5432 com `db.fhhgtjzwmhgdiokqqebg.supabase.co`
 
-### Fase F1 — Setup do Monorepo, Banco Supabase & Migrations ⏳ Próxima
-- [ ] Inicializar workspace root, `backend/` (Express + `pg` + Swagger + Winston + Joi) e `frontend/` (React 18 + Vite + TS + Design System)
-- [ ] Criar e aplicar migrations `001` a `007` e `001_initial_seed` diretamente no Supabase
-- [ ] Configurar `playwright.config.ts` e `frontend/playwright-ct.config.ts`
-- [ ] Criar `docs/DATABASE.md`, `docs/DATA_MAPPING.md` e atualizar `docs/SETUP.md`
-- [ ] Commit e push para `https://github.com/JuanBMMontesinos/HR-Hunter`
+### Fase F1 — Setup do Monorepo, Banco Supabase & Migrations ✅ Concluído
+- [x] Inicializar workspace root, `backend/` (Express + `pg` + Swagger + Winston + Helmet/CORS/RateLimiter) e `frontend/` (React 18 + Vite + TS + `design-system.json` + i18n `pt-BR`/`en-US` + componentes comuns)
+- [x] Criar e aplicar migrations `001` a `007` (27 tabelas, 3 views, 8 funções customizadas, 17 triggers) e executar `database/scripts/seed.js` diretamente no Supabase
+- [x] Configurar `playwright.config.ts` (`unit`, `api`, `e2e`) e `frontend/playwright-ct.config.ts` (`Button`, `StatusBadge`, `LanguageSwitcher`, `PageHeader`) com `14/14` testes aprovados
+- [x] Criar `docs/DATABASE.md`, `docs/DATA_MAPPING.md`, `docs/ARCHITECTURE.md`, `docs/SETUP.md`, `docs/TESTING.md` e sincronizar `README.md` / `CHANGELOG.md`
+- [x] Commit e push da Fase 1 para `https://github.com/JuanBMMontesinos/HR-Hunter`
 
-### Fase F2 — Backend Core: Auth, RBAC Granular & Segurança
+### Fase F2 — Backend Core: Auth, RBAC Granular & Segurança ⏳ Próxima
 - [ ] Implementar Auth (`/auth/login`, `logout`, `refresh-token`, `forgot-password`, `reset-password`, `permissions`)
 - [ ] Implementar Permissões Granulares (`/permissions/matrix`, `roles/:role`, `audit-log`)
 - [ ] Implementar Alertas de Segurança, Notificações, Exports CSV/PDF, Analytics (`SecurityReports`) e Retenção (`node-cron`)

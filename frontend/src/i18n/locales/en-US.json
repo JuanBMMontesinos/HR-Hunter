@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "HR Hunter",
+    "subtitle": "Global Recruitment Platform — Phase 1 Foundation",
+    "skipToContent": "Skip to main content"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "refresh": "Refresh",
+    "language": "Language"
+  },
+  "status": {
+    "connected": "Supabase Connected",
+    "disconnected": "Database Unavailable",
+    "checking": "Checking connection...",
+    "active": "Active",
+    "pending": "Pending",
+    "inactive": "Inactive"
+  },
+  "phase1": {
+    "heading": "Base Architecture & Supabase Connection",
+    "description": "Workspace initialized with official Design System, Express backend connected to Supabase PostgreSQL, PT-BR/EN-US i18n, and Playwright testing suite.",
+    "apiHealthLabel": "API & Supabase Status",
+    "designSystemLabel": "Design System",
+    "designSystemStatus": "Tokens active (Poppins + WCAG 2.1 AA)",
+    "nextPhaseLabel": "Next Phase",
+    "nextPhaseValue": "Phase F2 — JWT Auth, Granular Permissions & Security"
+  }
+}

@@ -1,0 +1,81 @@
+@layer theme {
+  :root {
+    /* Colors — from design-system.json */
+    --color-primary: #f7941e;
+    --color-primary-dark: #d6780f;
+    --color-secondary: #3c7eff;
+    --color-accent: #ffc66b;
+    --color-surface: #fdfdfd;
+    --color-surface-muted: #f5f5f5;
+    --color-canvas: #f5f6f8;
+    --color-border: #e2e2e2;
+    --color-text-primary: #2a2a2a;
+    --color-text-secondary: #6e6e6e;
+    --color-success: #3cb371;
+    --color-warning: #ffb347;
+    --color-danger: #d64545;
+
+    /* Semantic Status Surface & Text Tints (WCAG AA contrast >= 4.5:1) */
+    --color-success-bg: #eaf7ef;
+    --color-success-text: #1c6b41;
+    --color-warning-bg: #fff4e0;
+    --color-warning-text: #854d00;
+    --color-danger-bg: #fdecec;
+    --color-danger-text: #9e2222;
+    --color-neutral-bg: #eef0f4;
+    --color-neutral-text: #2a2a2a;
+
+    /* Typography — from design-system.json */
+    --font-family-primary: 'Poppins', 'Helvetica Neue', Arial, system-ui, sans-serif;
+    --font-size-display: 2rem;
+    --line-height-display: 2.5rem;
+    --font-size-heading: 1.25rem;
+    --line-height-heading: 1.75rem;
+    --font-size-title: 1.125rem;
+    --line-height-title: 1.625rem;
+    --font-size-body: 0.875rem;
+    --line-height-body: 1.25rem;
+    --font-size-caption: 0.75rem;
+    --line-height-caption: 1rem;
+    --font-size-label: 0.6875rem;
+    --line-height-label: 0.875rem;
+
+    /* Spacing Scale — 4px base unit */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-xxl: 32px;
+    --space-xxxl: 48px;
+
+    /* Layout & Grid */
+    --layout-max-width: 1280px;
+    --layout-gutter: 24px;
+
+    /* Radii & Borders */
+    --radius-none: 0px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+    --border-default: 1px solid var(--color-border);
+    --border-emphasis: 2px solid var(--color-primary);
+
+    /* Shadows */
+    --shadow-layer-1: 0 6px 12px rgba(0, 0, 0, 0.08);
+    --shadow-layer-2: 0 12px 28px rgba(0, 0, 0, 0.12);
+    --shadow-inner-raised: inset 2px 2px 6px rgba(0, 0, 0, 0.05), inset -2px -2px 6px rgba(255, 255, 255, 0.8);
+
+    /* Motion */
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --duration-card: 280ms;
+    --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Accessibility */
+    --touch-target-min: 44px;
+    --focus-outline: 2px solid var(--color-secondary);
+    --focus-outline-offset: 2px;
+  }
+}
